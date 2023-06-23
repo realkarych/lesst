@@ -1,0 +1,13 @@
+[bot]
+token =
+parse_mode = HTML
+
+[db]
+host = localhost
+port = 5432
+name =
+user =
+password =
+
+[mail]
+fernet_key = // Generate it with cryptography.fernet (https://github.com/pyca/cryptography)
