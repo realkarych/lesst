@@ -38,7 +38,7 @@ async def send_response(
         chat_action: ChatAction | None = ChatAction.TYPING,
         attachment: Attachment | None = None,
         disable_notification: bool = False,
-        disable_web_page_preview: bool = True,
+        web_preview: bool = True,
         reply_to_message_id: int | None = None
 ) -> None:
     if not chat_id:
@@ -52,7 +52,7 @@ async def send_response(
             message_thread_id=topic_id,
             text=text,
             reply_markup=markup,
-            disable_web_page_preview=disable_web_page_preview,
+            disable_web_page_preview=not web_preview,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id
         )
