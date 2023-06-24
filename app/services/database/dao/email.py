@@ -4,6 +4,7 @@ from sqlalchemy import update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.dtos.converters import convert_db_email_to_dto_email
 from app.dtos.email import EmailDTO
 from app.services.database.dao.base import BaseDAO
 from app.services.database.exception_mapper import exception_mapper
@@ -24,7 +25,7 @@ class EmailDAO(BaseDAO[Email]):
     async def get_email(self, user_id: int) -> EmailDTO | None:
         try:
             email = await self.get_by_id(user_id)
-            return email.to_dto()
+            return convert_db_email_to_dto_email(email)
         except NoResultFound:
             return None
 

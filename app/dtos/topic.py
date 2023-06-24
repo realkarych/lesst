@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.dtos.dto import DTO
-from app.services.database.models import Topic
+from app.services.database import models
 
 
 @dataclass(frozen=True)
@@ -13,8 +13,8 @@ class TopicDTO(DTO):
     topic_name: str  # address@domain — unique for forum
     topic_db_id: int | None = None  # Database unique topic id
 
-    def to_db_model(self) -> Topic:
-        return Topic(
+    def to_db_model(self) -> models.Topic:
+        return models.Topic(
             forum_id=self.forum_id,
             topic_id=self.topic_id,
             topic_name=self.topic_name

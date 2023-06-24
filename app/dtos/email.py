@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from app.dtos.dto import DTO
 from app.services import cryptography
-from app.services.database.models import Email
+from app.services.database import models
 
 
 @dataclass(frozen=True)
@@ -16,8 +16,8 @@ class EmailDTO(DTO):
     mail_auth_key: str
     email_db_id: int | None = None
 
-    def to_db_model(self) -> Email:
-        return Email(
+    def to_db_model(self) -> models.Email:
+        return models.Email(
             user_id=self.user_id,
             forum_id=self.forum_id,
             mail_server=self.mail_server,

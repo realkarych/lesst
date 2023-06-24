@@ -4,9 +4,9 @@ from sqlalchemy import delete, func, Row
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.services.database.base import Base
+from app.services.database.base import BASE
 
-Model = TypeVar('Model', Base, Base)
+Model = TypeVar('Model', BASE, BASE)
 
 
 class BaseDAO(Generic[Model]):

@@ -5,6 +5,7 @@ from typing import Iterable
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.dtos.converters import convert_db_topic_to_dto_topic
 from app.dtos.topic import TopicDTO
 from app.services.database.dao.base import BaseDAO
 from app.services.database.exception_mapper import exception_mapper
@@ -41,8 +42,8 @@ class TopicDAO(BaseDAO[Topic]):
         return set([topic_row[0] for topic_row in result])
 
     @exception_mapper
-    async def get_topics(self, forum_id: int) -> list[Topic]:
+    async def get_topics(self, forum_id: int) -> list[TopicDTO]:
         result = await self._session.execute(
             select(Topic).where(Topic.forum_id == forum_id)
         )
-        return [topic[0].to_dto() for topic in result.all()]
+        return [convert_db_topic_to_dto_topic(topic[0]) for topic in result.all()]
