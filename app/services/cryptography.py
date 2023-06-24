@@ -2,7 +2,6 @@ from cryptography.fernet import Fernet
 
 from app.settings.config import FERNET_KEY
 
-
 _ENCODING = "utf-8"
 
 

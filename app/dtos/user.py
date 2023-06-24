@@ -9,7 +9,6 @@ from app.services.database.models import User
 
 @dataclass(frozen=True)
 class UserDTO(DTO):
-
     id: int  # Telegram unique id
     username: str | None = None
     firstname: str | None = None

@@ -4,7 +4,6 @@ from sqlalchemy import Column, BigInteger, Integer, String, DateTime, func
 
 from app import dtos
 from app.services import cryptography
-
 from app.services.database.base import BASE
 
 

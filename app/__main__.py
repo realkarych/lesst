@@ -7,14 +7,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from app.core.handlers import factory
-from app.core.handlers.forum import creation_pipeline
 from app.core.handlers.private import menu
 from app.core.middlewares.db import DbSessionMiddleware
+from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.navigations.command import set_bot_commands
 from app.core.templates import build_translator_hub
 from app.services.database.connector import setup_get_pool
-
-from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.settings.config import Config, load_config
 
 

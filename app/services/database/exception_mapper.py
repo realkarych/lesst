@@ -12,7 +12,7 @@ Func = Callable[Param, ReturnType]
 
 
 def exception_mapper(
-    func: Callable[Param, Coroutine[Any, Any, ReturnType]]
+        func: Callable[Param, Coroutine[Any, Any, ReturnType]]
 ) -> Callable[Param, Coroutine[Any, Any, ReturnType]]:
     @wraps(func)
     async def wrapped(*args: Param.args, **kwargs: Param.kwargs) -> ReturnType:

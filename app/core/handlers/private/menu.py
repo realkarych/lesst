@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from aiogram import types, Router, Bot
 from aiogram.enums import ChatType
 from aiogram.filters import Command
@@ -25,5 +26,3 @@ def register() -> Router:
     )
 
     return router
-
-

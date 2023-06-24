@@ -1,45 +1,36 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator
-
-from sqlalchemy import update, select
+from sqlalchemy import update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dtos import dto
-from app.dtos.database import Topic
-from app.services.database.dao import mapper
+from app.dtos.email import EmailDTO
 from app.services.database.dao.base import BaseDAO
+from app.services.database.exception_mapper import exception_mapper
+from app.services.database.models import Email
 
 
-class TopicDAO(BaseDAO[Topic]):
-    """ORM queries for users table"""
+class EmailDAO(BaseDAO[Email]):
 
     def __init__(self, session: AsyncSession):
-        super().__init__(Topic, session)
+        super().__init__(Email, session)
 
-    async def add_topic(self, topic: dto.Topic):
-        await self._session.merge(mapper.map_to_db_topic(topic))
+    @exception_mapper
+    async def add_email(self, email: EmailDTO) -> None:
+        await self._session.merge(email.to_db_model())
         await self._session.commit()
 
-    async def get_topic_id(self, forum_id: int, email_address: str) -> int | None:
-        topic_id = await self._session.execute(
-            select(Topic.topic_id).where(Topic.forum_id == forum_id, Topic.topic_name == email_address)
-        )
-        return topic_id.scalar_one()
+    @exception_mapper
+    async def get_email(self, user_id: int) -> EmailDTO | None:
+        try:
+            email = await self.get_by_id(user_id)
+            return email.to_dto()
+        except NoResultFound:
+            return None
 
-    async def add_topics(self, topics: list[dto.Topic]):
-        self._session.add_all([mapper.map_to_db_topic(topic) for topic in topics])
+    @exception_mapper
+    async def set_topic(self, user_id: int, forum_id: int) -> None:
+        await self._session.execute(update(Email).where(Email.id == user_id).values(
+            forum_id=forum_id
+        ))
         await self._session.commit()
-
-    async def get_topic_ids(self, forum_id: int) -> set[str]:
-        result = await self._session.execute(
-            select(Topic.topic_id).where(Topic.forum_id == forum_id)
-        )
-        return set([row[0] for row in result])
-
-    async def get_topics(self, forum_id: int) -> list[Topic]:
-        result = await self._session.execute(
-            select(Topic).where(Topic.forum_id == forum_id)
-        )
-        return [dto.Topic.from_db(topic[0]) for topic in result.all()]
