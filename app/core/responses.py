@@ -9,7 +9,7 @@ from aiogram import types
 from aiogram.enums import ChatAction
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo
 
-from app.exceptions import UnexpectedError
+from app.exceptions import UnexpectedError, AppException
 
 
 class AttachmentType(str, Enum):
@@ -32,6 +32,7 @@ async def send_response(
         message: types.Message | types.CallbackQuery,
         bot: Bot,
         text: str | None = None,
+        text_nodes: list[str] | None = None,
         chat_id: int | None = None,
         topic_id: int | None = None,
         markup: types.InlineKeyboardMarkup | types.ReplyKeyboardMarkup | None = None,
@@ -41,21 +42,29 @@ async def send_response(
         web_preview: bool = True,
         reply_to_message_id: int | None = None
 ) -> None:
+    if text and text_nodes:
+        raise AppException("Provide text or text_nodes. Not both!")
+    if not attachment and not text and not text_nodes:
+        raise AppException("Provide text or text_nodes or attachment")
+
     if not chat_id:
         chat_id = message.from_user.id
     if chat_action:
         await bot.send_chat_action(chat_id=chat_id, message_thread_id=topic_id, action=chat_action)
 
     if not attachment:
-        await bot.send_message(
-            chat_id=chat_id,
-            message_thread_id=topic_id,
-            text=text,
-            reply_markup=markup,
-            disable_web_page_preview=not web_preview,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id
-        )
+        if not text_nodes and text:
+            text_nodes = [text]
+        for node in text_nodes:
+            await bot.send_message(
+                chat_id=chat_id,
+                message_thread_id=topic_id,
+                text=node,
+                reply_markup=markup,
+                disable_web_page_preview=not web_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id
+            )
 
     if attachment:
         match attachment.type_:
