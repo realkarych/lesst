@@ -2,17 +2,18 @@ from aiogram.utils.keyboard import (
     InlineKeyboardMarkup, InlineKeyboardBuilder, InlineKeyboardButton
 )
 
-from app.services.email import EmailServices, EmailServiceCallbackFactory
+from app.core.states.callbacks import EmailServiceCallbackFactory
+from app.services.email.entities import EmailServices
 
 
 def email_services() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for service in EmailServices:
         builder.button(
-            text=service().title,
+            text=service.value.title,
             callback_data=EmailServiceCallbackFactory(
                 action="choose_email_service",
-                service_id=service().id_)
+                service_id=service.value.id_)
         )
     builder.adjust(1)
     return builder.as_markup()

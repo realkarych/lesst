@@ -11,3 +11,5 @@ cancel = ✖️ Cancel action!
 menu-connect_email = ➕ Connect new Email
 menu-emails = 📮 My Emails
 menu-subscription = 💟 Subscription
+auth-choose_email_service = <b>Step 1.</b>
+                            Choose your Email-service:

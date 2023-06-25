@@ -25,3 +25,15 @@ def menu(i18n: TranslatorRunner) -> ResizedReplyKeyboard:
             ]
         ]
     )
+
+
+def cancel(i18n: TranslatorRunner) -> ResizedReplyKeyboard:
+    return ResizedReplyKeyboard(
+        keyboard=[
+            [
+                KeyboardButton(text=i18n.menu.back()),
+                KeyboardButton(text=i18n.menu.cancel())
+            ]
+        ]
+    )
+

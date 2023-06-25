@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union
+from typing import Union, List
 
 from aiogram import Bot
 from aiogram import types
 from aiogram.enums import ChatAction
-from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo
+from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message
 
 from app.exceptions import UnexpectedError, AppException
 
@@ -39,9 +39,9 @@ async def send_response(
         chat_action: ChatAction | None = ChatAction.TYPING,
         attachment: Attachment | None = None,
         disable_notification: bool = False,
-        web_preview: bool = True,
+        web_preview: bool = False,
         reply_to_message_id: int | None = None
-) -> None:
+) -> Message | list[Message]:
     if text and text_nodes:
         raise AppException("Provide text or text_nodes. Not both!")
     if not attachment and not text and not text_nodes:
@@ -55,21 +55,25 @@ async def send_response(
     if not attachment:
         if not text_nodes and text:
             text_nodes = [text]
+        first_message = None
         for node in text_nodes:
-            await bot.send_message(
-                chat_id=chat_id,
-                message_thread_id=topic_id,
-                text=node,
-                reply_markup=markup,
-                disable_web_page_preview=not web_preview,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id
-            )
+            msg = await bot.send_message(
+                    chat_id=chat_id,
+                    message_thread_id=topic_id,
+                    text=node,
+                    reply_markup=markup,
+                    disable_web_page_preview=not web_preview,
+                    disable_notification=disable_notification,
+                    reply_to_message_id=reply_to_message_id
+                )
+            if not first_message:
+                first_message = msg
+        return first_message
 
     if attachment:
         match attachment.type_:
             case AttachmentType.DOCUMENT:
-                await bot.send_document(
+                return await bot.send_document(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     document=attachment.file,
@@ -79,7 +83,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.PHOTO:
-                await bot.send_photo(
+                return await bot.send_photo(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     photo=attachment.file,
@@ -89,7 +93,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.VIDEO:
-                await bot.send_video(
+                return await bot.send_video(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     video=attachment.file,
@@ -99,7 +103,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.ROUND_VIDEO:
-                await bot.send_video_note(
+                return await bot.send_video_note(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     video_note=attachment.file,
@@ -108,7 +112,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.VOICE:
-                await bot.send_voice(
+                return await bot.send_voice(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     voice=attachment.file,
@@ -118,7 +122,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.AUDIO:
-                await bot.send_audio(
+                return await bot.send_audio(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     audio=attachment.file,
@@ -128,7 +132,7 @@ async def send_response(
                     disable_notification=disable_notification
                 )
             case AttachmentType.MEDIA_GROUP:
-                await bot.send_media_group(
+                return await bot.send_media_group(
                     chat_id=chat_id,
                     message_thread_id=topic_id,
                     media=attachment.file,
