@@ -20,3 +20,16 @@ auth-enter_email = 🏠 Email-сервис: <code>{ $email_service }</code>
 auth-incorrect_email = 🏠 Email-сервис: <code>{ $email_service }</code>
 
                        <b>Некорректный Email. Попробуй снова:</b>
+auth-set_imap_params-yandex = 🏠 Email-сервис: <code>{ $email_service }</code>
+                              📮 Email: <code>{ $email }</code>
+
+                              <b>1.</b> Зайди в <a href="https://mail.yandex.ru/?dpda=yes#setup/client">это меню</a> и включи 2 чекбокса, как на фото:
+auth-set_imap_params-gmail = 🏠 Email-сервис: <code>{ $email_service }</code>
+                             📮 Email: <code>{ $email }</code>
+
+                             <b>1.</b> Зайди в <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop">это меню</a> и отметь чекбоксы как на картинке. Не забудь нажать кнопку <b>"Сохранить изменения"</b>
+auth-set_imap_params-mail_ru = 🏠 Email-сервис: <code>{ $email_service }</code>
+                               📮 Email: <code>{ $email }</code>
+
+                               <b>1.</b> Проверь, чтобы параметры почты соответствовали указанным на картинке:
+auth-enter_password = <b>2.</b> Сгенерируй ключ доступа в <a href="{ $tutorial_url }">этом меню</a>, затем введи его:
