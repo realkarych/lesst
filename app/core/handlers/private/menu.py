@@ -11,8 +11,8 @@ from app.core.filters.chat_type import ChatTypeFilter
 from app.core.keyboards import reply, inline
 from app.core.navigations.command import Commands
 from app.core.responses import send_response
-from app.core.states.callbackdata_ids import AUTH_MESSAGE, MESSAGE_TO_REMOVE_ID
-from app.core.states.mail_authorization import MailAuth
+from app.core.states.callbackdata_ids import MESSAGE_TO_REMOVE_ID
+from app.core.states.mail_authorization import EmailAuth
 from app.dtos.user import UserDTO
 from app.services.database.dao.user import UserDAO
 
@@ -36,7 +36,7 @@ async def btn_add_new_email(m: types.Message, bot: Bot, i18n: TranslatorRunner,
     await m.delete()
     await bot.delete_message(chat_id=m.from_user.id, message_id=data.get(MESSAGE_TO_REMOVE_ID))
     await send_response(m, bot, text=i18n.auth.choose_email_service(), markup=inline.email_services())
-    await state.set_state(MailAuth.service)
+    await state.set_state(EmailAuth.service)
 
 
 def register() -> Router:

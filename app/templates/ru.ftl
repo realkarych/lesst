@@ -14,3 +14,9 @@ menu-emails = 📮 Мои ящики
 menu-subscription = 💟 Подписка
 auth-choose_email_service = <b>Шаг 1.</b>
                             Выбери твой Email-сервис:
+auth-enter_email = 🏠 Email-сервис: <code>{ $email_service }</code>
+
+                   <b>Введи 📮 Email-адрес:</b>
+auth-incorrect_email = 🏠 Email-сервис: <code>{ $email_service }</code>
+
+                       <b>Некорректный Email. Попробуй снова:</b>

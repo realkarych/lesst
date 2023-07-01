@@ -13,3 +13,9 @@ menu-emails = 📮 My Emails
 menu-subscription = 💟 Subscription
 auth-choose_email_service = <b>Step 1.</b>
                             Choose your Email-service:
+auth-enter_email = 🏠 Email-service: <code>{ $email_service }</code>
+
+                   <b>Enter 📮 Email-address:</b>
+auth-incorrect_email = 🏠 Email-service: <code>{ $email_service }</code>
+
+                       <b>Incorrect Email. Try again:</b>

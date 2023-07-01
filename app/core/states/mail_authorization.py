@@ -1,7 +1,7 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class MailAuth(StatesGroup):
+class EmailAuth(StatesGroup):
     service = State()
-    mail = State()
+    email = State()
     password = State()

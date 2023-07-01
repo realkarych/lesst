@@ -2,13 +2,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union, List
+from typing import Union
 
 from aiogram import Bot
 from aiogram import types
-from aiogram.enums import ChatAction
-from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message
+from aiogram.enums import ChatAction, ParseMode
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.fsm.context import FSMContext
+from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
+    InlineKeyboardMarkup, ReplyKeyboardMarkup
 
+from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
 from app.exceptions import UnexpectedError, AppException
 
 
@@ -141,3 +145,38 @@ async def send_response(
                 )
             case _:
                 raise UnexpectedError("Provided unknown attachment type to send_response() method")
+
+
+async def edit_or_build_email_message(
+        bot: Bot,
+        m: Message,
+        message_id: int,
+        text: str,
+        markup: InlineKeyboardMarkup | ReplyKeyboardMarkup | None,
+        state: FSMContext,
+        disable_web_page_preview: bool = True,
+        parse_mode: ParseMode | None = ParseMode.HTML
+) -> None:
+    """
+    Method implements updates email message. If it has been removed by user, creates new and update message id in
+    MemoryStorage
+    """
+
+    try:
+        await bot.edit_message_text(
+            chat_id=m.from_user.id,
+            message_id=message_id,
+            text=text,
+            disable_web_page_preview=disable_web_page_preview,
+            reply_markup=markup,
+            parse_mode=parse_mode
+        )
+
+    except TelegramBadRequest:
+        new_message = await m.answer(
+            text=text,
+            disable_web_page_preview=disable_web_page_preview,
+            reply_markup=markup,
+            parse_mode=parse_mode
+        )
+        await state.update_data({EMAIL_PIPELINE_MESSAGE: new_message.message_id})
