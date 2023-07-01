@@ -62,14 +62,14 @@ async def send_response(
         first_message = None
         for node in text_nodes:
             msg = await bot.send_message(
-                    chat_id=chat_id,
-                    message_thread_id=topic_id,
-                    text=node,
-                    reply_markup=markup,
-                    disable_web_page_preview=not web_preview,
-                    disable_notification=disable_notification,
-                    reply_to_message_id=reply_to_message_id
-                )
+                chat_id=chat_id,
+                message_thread_id=topic_id,
+                text=node,
+                reply_markup=markup,
+                disable_web_page_preview=not web_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id
+            )
             if not first_message:
                 first_message = msg
         return first_message

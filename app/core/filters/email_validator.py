@@ -12,8 +12,6 @@ from app.services.email import validator
 
 
 def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
-    """Handlers for non-anon users with @username in Telegram"""
-
     async def wrapper(m: types.Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner):
         data = await state.get_data()
         email = m.text.lower()
@@ -23,7 +21,8 @@ def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
         await edit_or_build_email_message(
             bot=bot, m=m, text=i18n.auth.incorrect_email(email_service=data.get(EMAIL_SERVICE).value.title),
             markup=inline.return_to_services,
-            message_id=data.get(EMAIL_PIPELINE_MESSAGE), state=state
+            message_id=data.get(EMAIL_PIPELINE_MESSAGE),
+            state=state
         )
         return
 

@@ -36,4 +36,3 @@ def cancel(i18n: TranslatorRunner) -> ResizedReplyKeyboard:
             ]
         ]
     )
-
