@@ -1,6 +1,6 @@
 from typing import Callable, Coroutine, Dict, Any
 
-from aiogram import types, Bot
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
 from aioimaplib import aioimaplib

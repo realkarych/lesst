@@ -11,9 +11,9 @@ from app.core.filters.chat_type import ChatTypeFilter
 from app.core.filters.email_connection import connection_success
 from app.core.filters.email_validator import valid_email, new_email
 from app.core.keyboards import inline
-from app.core.messages import remove_messages, enter_password_message
+from app.core.messages import enter_password_message
 from app.core.responses import edit_or_build_email_message
-from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, MESSAGE_TO_REMOVE_ID, EMAIL, \
+from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, EMAIL, \
     PHOTO_TO_REMOVE_ID
 from app.core.states.callbacks import EmailServiceCallbackFactory
 from app.core.states.mail_authorization import EmailAuth

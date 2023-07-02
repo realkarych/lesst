@@ -1,6 +1,6 @@
 from typing import Callable, Coroutine
 
-from aiogram import types, Bot
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from fluentogram import TranslatorRunner
@@ -35,7 +35,8 @@ def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
 
 
 def new_email(handler: callable) -> Callable[[Message], Coroutine]:
-    async def wrapper(m: Message, bot: Bot, state: FSMContext, session: AsyncSession, i18n: TranslatorRunner, email: str):
+    async def wrapper(m: Message, bot: Bot, state: FSMContext, session: AsyncSession, i18n: TranslatorRunner,
+                      email: str):
         data = await state.get_data()
         dao = EmailDAO(session)
         if not await dao.email_already_added(email_address=email):

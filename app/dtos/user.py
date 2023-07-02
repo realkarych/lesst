@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass
 
-from aiogram import types
 from aiogram.types import Message
 
 from app.dtos.dto import DTO
