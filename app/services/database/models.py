@@ -26,7 +26,7 @@ class Email(BASE):
     user_id = Column(BigInteger)  # User Telegram id
     forum_id = Column(BigInteger)  # Forum (Telegram chat with emails) id
     mail_server = Column(String)  # Gmail / Yandex / etc.
-    mail_address = Column(String)  # address@domain
+    mail_address = Column(String, unique=True)  # address@domain
     mail_auth_key = Column(String)  # Generated password. Is encrypted
 
     def __repr__(self) -> str:

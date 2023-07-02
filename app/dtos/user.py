@@ -4,6 +4,7 @@ import datetime
 from dataclasses import dataclass
 
 from aiogram import types
+from aiogram.types import Message
 
 from app.dtos.dto import DTO
 from app.services.database.models import User
@@ -19,7 +20,7 @@ class UserDTO(DTO):
     registered_time: datetime.datetime | None = None
 
     @classmethod
-    def from_message(cls, message: types.Message) -> UserDTO:
+    def from_message(cls, message: Message) -> UserDTO:
         return cls(
             id=message.from_user.id,
             username=message.from_user.username,

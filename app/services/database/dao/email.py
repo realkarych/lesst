@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import update
+from sqlalchemy import update, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +20,13 @@ class EmailDAO(BaseDAO[Email]):
     async def add_email(self, email: EmailDTO) -> None:
         await self._session.merge(email.to_db_model())
         await self._session.commit()
+
+    @exception_mapper
+    async def email_already_added(self, email_address: str) -> bool:
+        result = await self._session.execute(
+            select(Email).where(Email.mail_address == email_address)
+        )
+        return bool(result.scalar_one_or_none())
 
     @exception_mapper
     async def get_email(self, user_id: int) -> EmailDTO | None:

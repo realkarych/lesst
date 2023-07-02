@@ -10,7 +10,7 @@ from aiogram.enums import ChatAction, ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
-    InlineKeyboardMarkup, ReplyKeyboardMarkup
+    InlineKeyboardMarkup, ReplyKeyboardMarkup, CallbackQuery
 
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
 from app.exceptions import UnexpectedError, AppException
@@ -33,7 +33,7 @@ class Attachment:
 
 
 async def send_response(
-        message: types.Message | types.CallbackQuery,
+        message: Message | CallbackQuery,
         bot: Bot,
         text: str | None = None,
         text_nodes: list[str] | None = None,

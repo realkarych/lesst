@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from app.core.handlers import factory
-from app.core.handlers.private import menu, mail_adding_pipeline
+from app.core.handlers.private import menu, email_adding_pipeline
 from app.core.middlewares.db import DbSessionMiddleware
 from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.navigations.command import set_bot_commands
@@ -41,7 +41,7 @@ async def main() -> None:
     dp.callback_query.middleware(TranslatorRunnerMiddleware())
 
     # Provide your default handler-modules into register() func.
-    factory.register(dp, menu, mail_adding_pipeline)
+    factory.register(dp, menu, email_adding_pipeline)
 
     try:
         await dp.start_polling(bot, _translator_hub=build_translator_hub(),

@@ -4,6 +4,7 @@ from aiogram import types, Router, Bot
 from aiogram.enums import ChatType
 from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +18,7 @@ from app.dtos.user import UserDTO
 from app.services.database.dao.user import UserDAO
 
 
-async def cmd_start(m: types.Message, bot: Bot, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
+async def cmd_start(m: Message, bot: Bot, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
     await state.clear()
     await _add_user_to_db(session=session, message=m)
     await send_response(m, bot, text=i18n.welcome.one(user_firstname=m.from_user.first_name), web_preview=True)
@@ -25,12 +26,12 @@ async def cmd_start(m: types.Message, bot: Bot, i18n: TranslatorRunner, session:
     await state.set_data({MESSAGE_TO_REMOVE_ID: message.message_id})
 
 
-async def cmd_cancel(m: types.Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner):
+async def cmd_cancel(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner):
     await state.clear()
     await send_response(m, bot, text=i18n.cancel(), markup=reply.menu(i18n))
 
 
-async def btn_add_new_email(m: types.Message, bot: Bot, i18n: TranslatorRunner,
+async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner,
                             state: FSMContext):
     data = await state.get_data()
     await m.delete()

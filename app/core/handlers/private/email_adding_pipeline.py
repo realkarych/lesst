@@ -1,26 +1,27 @@
 from __future__ import annotations
 
-from contextlib import suppress
-from typing import Iterable
-
 from aiogram import types, Router, Bot
-from aiogram.enums import ChatType, ParseMode
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.enums import ChatType
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup, Message, FSInputFile
+from aiogram.types import Message, FSInputFile
 from fluentogram import TranslatorRunner
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import urls
 from app.core.filters.chat_type import ChatTypeFilter
-from app.core.filters.email_validator import valid_email
+from app.core.filters.email_connection import connection_success
+from app.core.filters.email_validator import valid_email, new_email
 from app.core.keyboards import inline
+from app.core.messages import remove_messages, enter_password_message
 from app.core.responses import edit_or_build_email_message
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, MESSAGE_TO_REMOVE_ID, EMAIL, \
     PHOTO_TO_REMOVE_ID
 from app.core.states.callbacks import EmailServiceCallbackFactory
 from app.core.states.mail_authorization import EmailAuth
+from app.dtos.email import EmailDTO
+from app.services.database.dao.email import EmailDAO
 from app.services.email.entities import get_service_by_id, EmailServices
 from app.settings import paths
+from app.settings.paths import get_imap_image_path
 
 
 async def cbq_email_service(
@@ -38,10 +39,9 @@ async def cbq_email_service(
 
 
 @valid_email
+@new_email
 async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner, email: str):
     data = await state.get_data()
-    await _remove_messages(chat_id=m.from_user.id, bot=bot,
-                           ids=(m.message_id, data.get(MESSAGE_TO_REMOVE_ID, data.get(EMAIL_PIPELINE_MESSAGE))))
 
     await edit_or_build_email_message(
         bot=bot,
@@ -52,8 +52,8 @@ async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: Tran
         state=state
     )
     photo_message = await m.answer_photo(
-        photo=FSInputFile(path=_get_imap_image_path(data.get(EMAIL_SERVICE))),
-        caption=_enter_password_message(data.get(EMAIL_SERVICE), i18n),
+        photo=FSInputFile(path=get_imap_image_path(data.get(EMAIL_SERVICE))),
+        caption=enter_password_message(data.get(EMAIL_SERVICE), i18n),
         reply_markup=inline.return_to_email
     )
 
@@ -62,31 +62,33 @@ async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: Tran
     await state.set_state(EmailAuth.password)
 
 
-def _enter_password_message(email_service: EmailServices, i18n: TranslatorRunner) -> str:
-    match email_service:
-        case EmailServices.yandex:
-            tutorial_url = urls.YANDEX_KEY_TUTORIAL_URL
-        case EmailServices.gmail:
-            tutorial_url = urls.GOOGLE_KEY_TUTORIAL_URL
-        case EmailServices.mail_ru:
-            tutorial_url = urls.MAIL_RU_KEY_TUTORIAL_URL
-        case _:
-            tutorial_url = urls.GOOGLE_KEY_TUTORIAL_URL
-    if tutorial_url:
-        return i18n.auth.enter_password(tutorial_url=tutorial_url)
+@connection_success
+async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, session: AsyncSession,
+                                  i18n: TranslatorRunner):
+    data = await state.get_data()
 
+    auth_key = str(m.text)
+    text = i18n.auth.connection_success(
+        email_service=data.get(EMAIL_SERVICE).value.title,
+        email=data.get(EMAIL),
+        password=auth_key
+    )
+    await edit_or_build_email_message(bot=bot, m=m, message_id=data.get(EMAIL_PIPELINE_MESSAGE), text=text, markup=None,
+                                      state=state)
 
-def _get_imap_image_path(email_service: EmailServices) -> str:
-    match email_service:
-        case EmailServices.yandex:
-            path = paths.YANDEX_IMAP_IMAGE_PATH
-        case EmailServices.gmail:
-            path = paths.GOOGLE_IMAP_IMAGE_PATH
-        case EmailServices.mail_ru:
-            path = paths.MAIL_RU_IMAP_IMAGE_PATH
-        case _:
-            path = paths.GOOGLE_IMAP_IMAGE_PATH
-    return path
+    await EmailDAO(session=session).add_email(
+        email=EmailDTO.from_email(
+            user_id=m.from_user.id,
+            email_service=data.get(EMAIL_SERVICE).value,
+            email_address=data.get(EMAIL),
+            email_auth_key=auth_key
+        )
+    )
+    await state.clear()
+
+    await m.answer_photo(photo=FSInputFile(path=paths.ACTIVATE_TOPICS_IMAGE_PATH), caption=i18n.auth.create_group())
+    await m.answer_photo(photo=FSInputFile(path=paths.GROUP_SETTINGS_IMAGE_PATH), caption=i18n.auth.add_to_chat(),
+                         reply_markup=inline.add_to_chat)
 
 
 def _get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices, email: str) -> str:
@@ -97,13 +99,6 @@ def _get_imap_params_message(i18n: TranslatorRunner, email_service: EmailService
             return i18n.auth.set_imap_params.gmail(email_service=email_service.value.title, email=email)
         case EmailServices.mail_ru:
             return i18n.auth.set_imap_params.mail_ru(email_service=email_service.value.title, email=email)
-
-
-async def _remove_messages(chat_id: int, bot: Bot, ids: Iterable[int]) -> None:
-    for message_id in ids:
-        if message_id:
-            with suppress(TelegramBadRequest):
-                await bot.delete_message(chat_id, message_id)
 
 
 def register() -> Router:
@@ -120,6 +115,12 @@ def register() -> Router:
         handle_valid_email,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
         EmailAuth.email
+    )
+
+    router.message.register(
+        handle_correct_password,
+        ChatTypeFilter(chat_type=ChatType.PRIVATE),
+        EmailAuth.password
     )
 
     return router

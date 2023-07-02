@@ -18,7 +18,7 @@ auth-enter_email = 🏠 Email-service: <code>{ $email_service }</code>
                    <b>Enter 📮 Email-address:</b>
 auth-incorrect_email = 🏠 Email-service: <code>{ $email_service }</code>
 
-                       <b>Incorrect Email. Try again:</b>
+                       <b>Incorrect Email: wrong format or already added. Try again:</b>
 auth-set_imap_params-yandex = 🏠 Email-service: <code>{ $email_service }</code>
                               📮 Email: <code>{ $email }</code>
 
@@ -32,3 +32,22 @@ auth-set_imap_params-mail_ru = 🏠 Email-service: <code>{ $email_service }</cod
 
                                <b>1.</b> Compare your settings with checkboxes on the picture:
 auth-enter_password = <b>2.</b> Generate access key in <a href="{ $tutorial_url }">this menu</a>, then enter:
+auth-connection_refused = 🏠 <b>Email-service:</b> <code>{ $email_service }</code>
+                          📮 <b>Email:</b> <code>{ $email }</code>
+                          🔑 <b>Auth key:</b> <span class="tg-spoiler">{ $password }</span>
+
+                          ❌ Email connection refused! How to solve:
+                          <b>1.</b> Check pair email - auth key (generate it here: { $tutorial_url }).
+                          <b>2.</b> Check if IMAP ({ $imap_tutorial_url }) is enabled, like on the picture:
+auth-connection_success = 🏠 <b>Email-service:</b> <code>{ $email_service }</code>
+                          📮 <b>Email:</b> <code>{ $email }</code>
+                          🔑 <b>Auth key:</b> <span class="tg-spoiler">{ $password }</span>
+
+                          ✅ <b>Email has been successfully connected to bot!</b>
+auth-create_group = <b>Step 2.</b>
+
+                    <b>1.</b> Create private group and enable "Topics" in settings, like on picture
+auth-add_to_chat = <b>2.</b> Tap on button and add bot to created group.
+                   Give access rights, marked on picture.
+
+                   <i>(You can give all rights, if you want)</i>
