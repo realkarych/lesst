@@ -28,3 +28,13 @@ def enter_password_message(email_service: EmailServices, i18n: TranslatorRunner)
             tutorial_url = urls.GOOGLE_KEY_TUTORIAL_URL
     if tutorial_url:
         return i18n.auth.enter_password(tutorial_url=tutorial_url)
+
+
+def get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices, email: str) -> str:
+    match email_service:
+        case EmailServices.yandex:
+            return i18n.auth.set_imap_params.yandex(email_service=email_service.value.title, email=email)
+        case EmailServices.gmail:
+            return i18n.auth.set_imap_params.gmail(email_service=email_service.value.title, email=email)
+        case EmailServices.mail_ru:
+            return i18n.auth.set_imap_params.mail_ru(email_service=email_service.value.title, email=email)
