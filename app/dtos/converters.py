@@ -41,8 +41,8 @@ def convert_db_topic_to_dto_topic(topic: Topic) -> TopicDTO:
 
 def convert_db_incoming_email_message_to_dto(incoming_email: IncomingEmailMessage) -> IncomingEmailMessageDTO:
     return IncomingEmailMessageDTO(
-        email_message_db_id=incoming_email.id,
-        email_id=incoming_email.email_id,
-        incoming_email_id=incoming_email.incoming_email_id,
-        destination_topic_id=incoming_email.destination_topic_id
+        email_message_db_id=int(str(incoming_email.id)),
+        email_id=int(str(incoming_email.email_id)),
+        incoming_email_id=int(str(incoming_email.incoming_email_id)),
+        destination_topic_id=int(str(incoming_email.destination_topic_id))
     )
