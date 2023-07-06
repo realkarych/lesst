@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "Aioplate"
+name = "Lesst"
 version = "0.0"
-description = "Telegram Bot template"
+description = "Lesst — less than Email client"
 authors = ["Andrey Karchevsky <karych@karych.ru>"]
 
 [tool.poetry.dependencies]

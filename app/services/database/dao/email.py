@@ -29,10 +29,22 @@ class EmailDAO(BaseDAO[Email]):
         return bool(result.scalar_one_or_none())
 
     @exception_mapper
-    async def get_email(self, user_id: int) -> EmailDTO | None:
+    async def get_email(self, user_id: int, forum_id: int) -> EmailDTO | None:
         try:
-            email = await self.get_by_id(user_id)
-            return convert_db_email_to_dto_email(email)
+            result = await self._session.execute(
+                select(Email).where(Email.user_id == user_id, Email.forum_id == forum_id)
+            )
+            return convert_db_email_to_dto_email(result.scalar_one_or_none())
+        except NoResultFound:
+            return None
+
+    @exception_mapper
+    async def get_email_without_forum(self, user_id: int) -> EmailDTO | None:
+        try:
+            result = await self._session.execute(
+                select(Email).where(Email.user_id == user_id, Email.forum_id is None)
+            )
+            return convert_db_email_to_dto_email(result.scalar_one_or_none())
         except NoResultFound:
             return None
 

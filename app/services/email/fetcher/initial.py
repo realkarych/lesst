@@ -12,11 +12,11 @@ class InitialMailboxFetcher(Mailbox):
                  cache_dir: EmailCacheDirectory) -> None:
         super().__init__(email_service, email_address, email_auth_key, user_id, cache_dir)
 
-    async def fetch(self) -> AsyncGenerator[list[Email]]:
+    async def fetch_emails(self) -> AsyncGenerator[list[Email]]:
         emails: list[Email] = list()
         batch_size = 10
         email_count = 0
-        for email_id in await self._get_email_ids():
+        for email_id in await self._get_emails_ids():
             email = await self.get_email(email_id)
             if email:
                 emails.append(email)
@@ -26,14 +26,8 @@ class InitialMailboxFetcher(Mailbox):
                     yield emails
                     emails.clear()
 
-    async def _get_email_ids(self) -> list[str]:
+    async def _get_emails_ids(self, limit: int = INITIAL_FETCH_EMAILS_COUNT) -> list[str]:
         status, data = await self._client.search(EmailFlagPattern.ALL)
-        ids = self._get_email_ids_from_response(data)[:INITIAL_FETCH_EMAILS_COUNT]
+        ids = self._get_emails_ids_from_response(data)[:limit]
         ids.reverse()
         return ids
-
-    @staticmethod
-    def _get_email_ids_from_response(response_data: tuple) -> list[str]:
-        data = str(response_data[0]).split()
-        mail_ids = [''.join(filter(str.isdigit, _id)) for _id in data]
-        return mail_ids

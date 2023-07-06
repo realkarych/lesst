@@ -86,3 +86,9 @@ class Mailbox:
             text=text,
             attachments_path=attachments_path
         )
+
+    @staticmethod
+    def _get_emails_ids_from_response(response_data: tuple) -> list[str]:
+        data = str(response_data[0]).split()
+        mail_ids = [''.join(filter(str.isdigit, _id)) for _id in data]
+        return mail_ids
