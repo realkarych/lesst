@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from app.dtos.email import EmailDTO
+from app.dtos.incoming_email import IncomingEmailMessageDTO
 from app.dtos.topic import TopicDTO
 from app.dtos.user import UserDTO
-from app.dtos.incoming_email import IncomingEmailMessageDTO
 from app.services import cryptography
 from app.services.database.models import User, Email, Topic, IncomingEmailMessage
 
