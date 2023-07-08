@@ -39,7 +39,8 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) 
                         if email:
                             await _broadcast_email(bot=bot, session=session, email=email,
                                                    forum_id=incoming_email.forum_id)
-                        await incoming_dao.remove_email_message(email_message=incoming_email)
+
+            await incoming_dao.remove_email_message(email_message=incoming_email)
 
 
 async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:

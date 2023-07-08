@@ -190,21 +190,23 @@ async def edit_or_build_email_message(
 async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_notification: bool = False) -> None:
     first_text_batch_id = None
     if email.text:
+        last_text_part_index = len(email.text)-1
         for text_part, text_batch in enumerate(email.text):
             if text_part == 0:
-                with suppress(TelegramBadRequest):
-                    msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                                 text=get_first_email_message(email),
-                                                 disable_notification=disable_notification,
-                                                 parse_mode=None)
-                    first_text_batch_id = msg.message_id
+                text = get_first_email_message(email)
             else:
-                with suppress(TelegramBadRequest):
-                    await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                           text=text_batch,
-                                           disable_notification=disable_notification,
-                                           parse_mode=None)
-            await asyncio.sleep(1)
+                text = text_batch
+            if text_part == last_text_part_index:
+                text = f"{text}\n\n{email.date}"
+
+            with suppress(TelegramBadRequest):
+                msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                             text=text,
+                                             disable_notification=disable_notification,
+                                             parse_mode=None)
+                if not first_text_batch_id:
+                    first_text_batch_id = msg.message_id
+                await asyncio.sleep(1)
     else:
         with suppress(TelegramBadRequest):
             msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,

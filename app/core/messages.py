@@ -41,7 +41,7 @@ def get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices
 
 
 def get_first_email_message(email: Email) -> str:
-    return f"{email.from_name}: {email.subject}\n\n{email.text[0]}\n\n{email.date}"
+    return f"{email.from_name}: {email.subject}\n\n{email.text[0]}"
 
 
 def get_first_email_message_without_text(email: Email) -> str:

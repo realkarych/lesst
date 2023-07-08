@@ -68,10 +68,8 @@ class Mailbox:
         text = None
         subject = None
 
-        print(soup.text)
-        if soup.findAll("p"):
-            text_nodes = [node.text for node in soup.findAll("p")]
-            text = parser.form_mail_text_nodes("\n\n".join(text_nodes))
+        if soup.text:
+            text = parser.form_mail_text_nodes(soup.get_text())
         if email.subject:
             subject = email.subject
 
