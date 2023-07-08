@@ -30,6 +30,6 @@ return_to_email = InlineKeyboardMarkup(inline_keyboard=[
 add_to_chat = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="Добавить в чат",
-                              url="tg://resolve?domain=mail_inbot&startgroup")]
+                              url="tg://resolve?domain=lesstrobot&startgroup")]
     ]
 )

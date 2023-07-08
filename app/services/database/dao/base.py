@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TypeVar, Type, Generic
 
 from sqlalchemy import delete, func, Row
@@ -29,7 +31,7 @@ class BaseDAO(Generic[Model]):
         result = await self._session.execute(select(self._model))
         return [i for i in result.all()]
 
-    async def get_by_id(self, id_: int) -> Model:
+    async def get_by_id(self, id_: int) -> Model | None:
         """
         :param id_: input id
         :return:
@@ -37,7 +39,7 @@ class BaseDAO(Generic[Model]):
         result = await self._session.execute(
             select(self._model).where(self._model.id == id_)
         )
-        return result.scalar_one()
+        return result.scalar_one_or_none()
 
     async def delete_all(self) -> None:
         """

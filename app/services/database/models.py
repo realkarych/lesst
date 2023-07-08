@@ -24,7 +24,7 @@ class Email(BASE):
     __tablename__ = "emails"
     id = Column(BigInteger, primary_key=True, unique=True, autoincrement=True)
     user_id = Column(BigInteger)  # User Telegram id
-    forum_id = Column(BigInteger)  # Forum (Telegram chat with emails) id
+    forum_id = Column(BigInteger, default=None)  # Forum (Telegram chat with emails) id
     mail_server = Column(String)  # Gmail / Yandex / etc.
     mail_address = Column(String, unique=True)  # address@domain
     mail_auth_key = Column(String)  # Generated password. Is encrypted
@@ -49,6 +49,7 @@ class Topic(BASE):
 class IncomingEmailMessage(BASE):
     __tablename__ = "incoming_email_messages"
     id = Column(BigInteger, primary_key=True, unique=True, autoincrement=True)
-    destination_topic_id = Column(BigInteger)  # Topic ID in database table "topics"
-    email_id = Column(BigInteger)  # Email ID in database table "emails"
-    incoming_email_id = Column(Integer)  # Email ID in mailbox
+    user_id = Column(BigInteger)
+    forum_id = Column(BigInteger)
+    user_email_db_id = Column(BigInteger)  # Email ID in database table "emails"
+    mailbox_email_id = Column(Integer)  # Email ID in mailbox

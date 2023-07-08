@@ -7,7 +7,6 @@ from app.settings.limits import EMAIL_NODE_SIZE
 def form_mail_text_nodes(text: str) -> list[str]:
     max_characters = EMAIL_NODE_SIZE  # Telegram API limit per message
     text_builder = []
-    text = unicodedata.normalize('NFKD', text)
     text = re.sub(" +", " ", text)
     text = re.sub("\n+", "\n", text)
     text = re.sub("\t+", " ", text)

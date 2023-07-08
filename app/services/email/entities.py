@@ -15,7 +15,7 @@ class Email:
     date: datetime
     subject: str | None = None
     text: list[str] | None = None
-    attachments_path: PurePath | None = None
+    attachments_paths: tuple[PurePath] | None = None
 
 
 class EmailConnectionType(str, Enum):

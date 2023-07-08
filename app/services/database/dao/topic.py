@@ -23,11 +23,18 @@ class TopicDAO(BaseDAO[Topic]):
         await self._session.commit()
 
     @exception_mapper
-    async def get_topic_id(self, forum_id: int, email_address: str) -> int | None:
-        topic_id = await self._session.execute(
-            select(Topic.topic_id).where(Topic.forum_id == forum_id, Topic.topic_name == email_address)
+    async def is_topic_created(self, forum_id: int, email_address: str) -> bool:
+        response = await self._session.execute(
+            select(Topic).where(Topic.forum_id == forum_id, Topic.topic_name == email_address)
         )
-        return topic_id.scalar_one()
+        return bool(response.scalar_one_or_none())
+
+    @exception_mapper
+    async def get_topic(self, forum_id: int, email_address: str) -> TopicDTO:
+        topic = await self._session.execute(
+            select(Topic).where(Topic.forum_id == forum_id, Topic.topic_name == email_address)
+        )
+        return convert_db_topic_to_dto_topic(topic.scalar_one())
 
     @exception_mapper
     async def add_topics(self, topics: Iterable[TopicDTO]):
@@ -39,11 +46,11 @@ class TopicDAO(BaseDAO[Topic]):
         result = await self._session.execute(
             select(Topic.topic_id).where(Topic.forum_id == forum_id)
         )
-        return set([topic_row[0] for topic_row in result])
+        return set(result.scalars())
 
     @exception_mapper
     async def get_topics(self, forum_id: int) -> list[TopicDTO]:
         result = await self._session.execute(
             select(Topic).where(Topic.forum_id == forum_id)
         )
-        return [convert_db_topic_to_dto_topic(topic[0]) for topic in result.all()]
+        return [convert_db_topic_to_dto_topic(topic) for topic in result.scalars()]

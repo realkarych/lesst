@@ -41,7 +41,7 @@ class Mailbox:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self._client.logout()
 
-    async def can_connect(self) -> bool:
+    def can_connect(self) -> bool:
         connection_state = self._client.get_state()
         if connection_state in (EmailConnectionType.AUTH, EmailConnectionType.SELECTED):
             return True
@@ -67,14 +67,14 @@ class Mailbox:
 
         text = None
         subject = None
-        attachments_path = None
 
         if soup.findAll("p"):
             text_nodes = [node.text for node in soup.findAll("p")]
             text = parser.form_mail_text_nodes("\n\n".join(text_nodes))
         if email.subject:
             subject = email.subject
-        self._cache_dir.save_attachments(email=email, email_id=int(email_id))
+
+        attachments_paths = self._cache_dir.save_attachments(email=email, email_id=int(email_id))
 
         return Email(
             id_=email_id,
@@ -84,11 +84,5 @@ class Mailbox:
             date=email.date,
             subject=subject,
             text=text,
-            attachments_path=attachments_path
+            attachments_paths=attachments_paths
         )
-
-    @staticmethod
-    def _get_emails_ids_from_response(response_data: tuple) -> list[str]:
-        data = str(response_data[0]).split()
-        mail_ids = [''.join(filter(str.isdigit, _id)) for _id in data]
-        return mail_ids

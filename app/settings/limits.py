@@ -1,3 +1,3 @@
 PAUSE_SECONDS_BETWEEN_MESSAGES = 0.7
-EMAIL_NODE_SIZE = 3000  # Symbols of Email text between 
+EMAIL_NODE_SIZE = 3000  # Symbols of Email text per message
 INITIAL_FETCH_EMAILS_COUNT = 50

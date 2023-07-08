@@ -84,7 +84,7 @@ async def is_connection_success(email_service: EmailService, email: str, auth_ke
                           cache_dir=cache)
         try:
             async with mailbox:
-                can_create_connection = await mailbox.can_connect()
-            return can_create_connection
+                can_create_connection = mailbox.can_connect()
+                return can_create_connection
         except aioimaplib.Abort:
             return False

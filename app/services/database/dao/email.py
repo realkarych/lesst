@@ -34,7 +34,7 @@ class EmailDAO(BaseDAO[Email]):
             result = await self._session.execute(
                 select(Email).where(Email.user_id == user_id, Email.forum_id == forum_id)
             )
-            return convert_db_email_to_dto_email(result.scalar_one_or_none())
+            return convert_db_email_to_dto_email(result.scalar_one())
         except NoResultFound:
             return None
 
@@ -42,15 +42,16 @@ class EmailDAO(BaseDAO[Email]):
     async def get_email_without_forum(self, user_id: int) -> EmailDTO | None:
         try:
             result = await self._session.execute(
-                select(Email).where(Email.user_id == user_id, Email.forum_id is None)
+                select(Email).where(Email.user_id == user_id, Email.forum_id == None)
             )
-            return convert_db_email_to_dto_email(result.scalar_one_or_none())
+            return convert_db_email_to_dto_email(result.scalar_one())
         except NoResultFound:
             return None
 
     @exception_mapper
-    async def set_topic(self, user_id: int, forum_id: int) -> None:
-        await self._session.execute(update(Email).where(Email.id == user_id).values(
-            forum_id=forum_id
-        ))
+    async def set_forum(self, user_id: int, mail_address: str, forum_id: int) -> None:
+        await self._session.execute(
+            update(Email).where(Email.user_id == user_id, Email.mail_address == mail_address).values(
+                forum_id=forum_id
+            ))
         await self._session.commit()

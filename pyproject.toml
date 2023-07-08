@@ -17,6 +17,7 @@ mail-parser = "==3.15.0"
 beautifulsoup4 = "==4.12.2"
 cryptography = "==41.0.1"
 fluentogram = "==1.1.6"
+APScheduler = "==3.10.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"

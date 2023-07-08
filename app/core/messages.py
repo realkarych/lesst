@@ -6,7 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from fluentogram import TranslatorRunner
 
 from app.core import urls
-from app.services.email.entities import EmailServices
+from app.services.email.entities import EmailServices, Email
 
 
 async def remove_messages(chat_id: int, bot: Bot, ids: Iterable[int]) -> None:
@@ -38,3 +38,11 @@ def get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices
             return i18n.auth.set_imap_params.gmail(email_service=email_service.value.title, email=email)
         case EmailServices.mail_ru:
             return i18n.auth.set_imap_params.mail_ru(email_service=email_service.value.title, email=email)
+
+
+def get_first_email_message(email: Email) -> str:
+    return f"{email.from_name}: {email.subject}\n\n{email.text[0]}\n\n{email.date}"
+
+
+def get_first_email_message_without_text(email: Email) -> str:
+    return f"{email.from_name}: {email.subject}\n\n{email.date}"

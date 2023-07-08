@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+from contextlib import suppress
 from dataclasses import dataclass
 from enum import Enum
 from typing import Union
@@ -11,9 +13,14 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
     InlineKeyboardMarkup, ReplyKeyboardMarkup, CallbackQuery
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.messages import get_first_email_message, get_first_email_message_without_text
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
+from app.dtos.topic import TopicDTO
 from app.exceptions import UnexpectedError, AppException
+from app.services.database.dao.topic import TopicDAO
+from app.services.email.entities import Email
 
 
 class AttachmentType(str, Enum):
@@ -180,3 +187,38 @@ async def edit_or_build_email_message(
             parse_mode=parse_mode
         )
         await state.update_data({EMAIL_PIPELINE_MESSAGE: new_message.message_id})
+
+
+async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_notification: bool = False) -> None:
+    first_text_batch_id = None
+    if email.text:
+        for text_part, text_batch in enumerate(email.text):
+            if text_part == 0:
+                with suppress(TelegramBadRequest):
+                    msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                                 text=get_first_email_message(email),
+                                                 disable_notification=disable_notification,
+                                                 parse_mode=None)
+                    first_text_batch_id = msg.message_id
+            else:
+                with suppress(TelegramBadRequest):
+                    await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                           text=text_batch,
+                                           disable_notification=disable_notification,
+                                           parse_mode=None)
+            await asyncio.sleep(1)
+    else:
+        with suppress(TelegramBadRequest):
+            msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                         text=get_first_email_message_without_text(email),
+                                         disable_notification=disable_notification)
+            first_text_batch_id = msg.message_id
+
+    if email.attachments_paths:
+        for attachment_path in email.attachments_paths:
+            with suppress(TelegramBadRequest):
+                await bot.send_document(chat_id=topic.forum_id,
+                                        message_thread_id=topic.topic_id,
+                                        reply_to_message_id=first_text_batch_id,
+                                        document=FSInputFile(str(attachment_path)))
+                await asyncio.sleep(3)

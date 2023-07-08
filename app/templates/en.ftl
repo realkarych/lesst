@@ -55,6 +55,6 @@ forum-general_topic_name = Service messages
 forum-email_not_added = Before adding a bot to a group, you need to connect your email to the bot. Go to the @mail_inbot PM and click /start
 forum-group_added = ✔️ The group has been added successfully. Emails will be uploaded to the sidebar within a few minutes. The more emails you have, the longer the process will take.
 
-                    <i>You can exit the chat, the download will not be interrupted. At the end, you will receive a notification from the bot in private messages</i>
+                    <i>You can exit the chat, the download will not be interrupted.</i>
 forum-no_permissions = Bot added without access rights.
                        Provide access rights, like on the picture. Bot will work automatically

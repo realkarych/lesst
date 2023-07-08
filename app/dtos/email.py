@@ -11,10 +11,10 @@ from app.services.email.entities import EmailService
 @dataclass(frozen=True)
 class EmailDTO(DTO):
     user_id: int
-    forum_id: int
     mail_server: str
     mail_address: str
     mail_auth_key: str
+    forum_id: int | None = None
     email_db_id: int | None = None
 
     def to_db_model(self) -> models.Email:
@@ -33,6 +33,6 @@ class EmailDTO(DTO):
             user_id=user_id,
             mail_server=email_service.id_,
             mail_address=email_address,
-            mail_auth_key=cryptography.encrypt_key(email_auth_key),
+            mail_auth_key=email_auth_key,
             forum_id=forum_id
         )

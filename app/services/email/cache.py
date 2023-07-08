@@ -25,16 +25,19 @@ class EmailCacheDirectory:
         """: Returns saved attachments paths"""
         if email.attachments:
             email.write_attachments(base_path=str(self._build_path(email_id)))
-        return self._get_saved_attachments_paths(email_id)
+            return self._get_saved_attachments_paths(email_id)
 
     def _get_saved_attachments_paths(self, email_id: int) -> tuple[str] | None:
         attachments_paths = list()
         path = self._build_path(email_id)
-        for file_name in os.listdir(path):
-            attachments_paths.append(str(path / file_name))
-        if not attachments_paths:
+        try:
+            for file_name in os.listdir(path):
+                attachments_paths.append(str(path / file_name))
+            if not attachments_paths:
+                return None
+            return tuple(attachments_paths)
+        except FileNotFoundError:
             return None
-        return tuple(attachments_paths)
 
     def _remove(self) -> None:
         shutil.rmtree(self._path, ignore_errors=True)
