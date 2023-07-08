@@ -58,3 +58,7 @@ forum-group_added = ✔️ The group has been added successfully. Emails will be
                     <i>You can exit the chat, the download will not be interrupted.</i>
 forum-no_permissions = Bot added without access rights.
                        Provide access rights, like on the picture. Bot will work automatically
+forum-not_forum = Bot added, but "Topics" are disabled. How to fix:
+                  1) Remove bot from this group
+                  2) Enable "Topics" in group
+                  3) Add bot to group again

@@ -9,6 +9,7 @@ from aiogram.types import ChatMemberUpdated, ChatMemberOwner, FSInputFile
 from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.filters.forum import is_forum
 from app.dtos.email import EmailDTO
 from app.dtos.incoming_email import IncomingEmailMessageDTO
 from app.services.database.dao.email import EmailDAO
@@ -19,11 +20,9 @@ from app.services.email.fetcher.initial import InitialMailboxFetcher
 from app.settings import paths
 
 
+@is_forum
 async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession, bot: Bot,
                                  i18n: TranslatorRunner) -> None:
-    if not event.chat.is_forum:
-        return
-
     email_dao = EmailDAO(session=session)
     user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
     await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
