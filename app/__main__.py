@@ -30,12 +30,14 @@ async def main() -> None:
 
     bot = Bot(config.bot.token, parse_mode=config.bot.parse_mode)
     await set_bot_commands(bot=bot)
-
     dp = Dispatcher(bot=bot, storage=MemoryStorage())
+    
     sessionmaker = await setup_get_pool(db_uri=config.db.get_uri())
+
     _set_middlewares(dp=dp, sessionmaker=sessionmaker)
+
     scheduler = _init_scheduler()
-    await _set_schedulers(scheduler=scheduler, bot=bot, sessionmaker=sessionmaker)
+    await _set_schedulers(scheduler=scheduler, bot=bot, session_pool=sessionmaker)
 
     # Provide your default handler-modules into register() func.
     factory.register(dp, menu, email_adding_pipeline, forum_updates)
@@ -45,8 +47,6 @@ async def main() -> None:
                                allowed_updates=dp.resolve_used_update_types())
     finally:
         scheduler.shutdown()
-        async with sessionmaker() as session:
-            await session.close_all()
         await dp.storage.close()
         await bot.session.close()
 
@@ -80,9 +80,8 @@ def _set_middlewares(dp: Dispatcher, sessionmaker: async_sessionmaker) -> None:
     dp.callback_query.middleware(TranslatorRunnerMiddleware())
 
 
-async def _set_schedulers(scheduler: AsyncIOScheduler, bot: Bot, sessionmaker: async_sessionmaker) -> None:
-    async with sessionmaker() as session:
-        scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, session))
+async def _set_schedulers(scheduler: AsyncIOScheduler, bot: Bot, session_pool: async_sessionmaker) -> None:
+    scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, session_pool))
 
 
 if __name__ == "__main__":

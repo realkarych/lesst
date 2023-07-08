@@ -1,5 +1,4 @@
 import re
-import unicodedata
 
 from app.settings.limits import EMAIL_NODE_SIZE
 

@@ -13,13 +13,11 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
     InlineKeyboardMarkup, ReplyKeyboardMarkup, CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.messages import get_first_email_message, get_first_email_message_without_text
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
 from app.dtos.topic import TopicDTO
 from app.exceptions import UnexpectedError, AppException
-from app.services.database.dao.topic import TopicDAO
 from app.services.email.entities import Email
 
 
