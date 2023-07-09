@@ -32,7 +32,8 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
     await _update_forum_settings(event, bot, i18n)
 
     if not user_email:
-        await bot.send_message(chat_id=event.chat.id, text=i18n.forum.email_not_added())
+        with suppress(TelegramBadRequest):
+            await bot.send_message(chat_id=event.chat.id, text=i18n.forum.email_not_added())
         return
     try:
         await bot.send_message(chat_id=event.chat.id, text=i18n.forum.group_added())
