@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.chat_type import ChatTypeFilter
 from app.core.keyboards import reply, inline
+from app.core.navigations import reply as reply_callbacks
 from app.core.navigations.command import Commands
 from app.core.responses import send_response
 from app.core.states.callbackdata_ids import MESSAGE_TO_REMOVE_ID
@@ -59,7 +60,7 @@ def register() -> Router:
     router.message.register(
         btn_add_new_email,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Text(text=["➕ Подключить новую почту", "➕ Connect new Email"])
+        Text(text=reply_callbacks.CONNECT_NEW_EMAIL)
     )
 
     return router
