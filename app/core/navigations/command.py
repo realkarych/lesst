@@ -36,7 +36,6 @@ class Commands(BaseCommandList):
     """
     List of commands with public access & submission to Telegram menu list.
     Do not implement here admin commands because of submission to menu.
-    For this case, create another commands list & factory.
     """
 
     start = Command(name='start', description='Перезапустить бота')
