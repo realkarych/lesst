@@ -19,6 +19,15 @@ class EmailDTO(DTO):
     email_db_id: int | None = None
 
     def to_db_model(self) -> models.Email:
+        if self.last_email_id:
+            return models.Email(
+                user_id=self.user_id,
+                forum_id=self.forum_id,
+                mail_server=self.mail_server,
+                mail_address=self.mail_address,
+                mail_auth_key=cryptography.encrypt_key(self.mail_auth_key),
+                last_email_id=self.last_email_id
+            )
         return models.Email(
             user_id=self.user_id,
             forum_id=self.forum_id,
