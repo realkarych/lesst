@@ -28,10 +28,11 @@ class Email(BASE):
     mail_server = Column(String)  # Gmail / Yandex / etc.
     mail_address = Column(String, unique=True)  # address@domain
     mail_auth_key = Column(String)  # Generated password. Is encrypted
+    last_email_id = Column(Integer, default=0)  # Last sent email_id. Email_id — id from mailbox
 
     def __repr__(self) -> str:
         return f"Email: {self.id}, {self.user_id}, {self.forum_id}, {self.mail_server} " \
-               f"{self.mail_address}, {self.mail_auth_key}"
+               f"{self.mail_address}, {self.mail_auth_key}, {self.last_email_id}"
 
 
 class Topic(BASE):

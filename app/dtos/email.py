@@ -14,6 +14,7 @@ class EmailDTO(DTO):
     mail_server: str
     mail_address: str
     mail_auth_key: str
+    last_email_id: int = 0
     forum_id: int | None = None
     email_db_id: int | None = None
 

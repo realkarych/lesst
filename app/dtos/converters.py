@@ -26,7 +26,8 @@ def convert_db_email_to_dto_email(email: Email) -> EmailDTO:
         forum_id=int(str(email.forum_id)) if email.forum_id else None,
         mail_server=str(email.mail_server),
         mail_address=str(email.mail_address),
-        mail_auth_key=cryptography.decrypt_key(str(email.mail_auth_key))
+        mail_auth_key=cryptography.decrypt_key(str(email.mail_auth_key)),
+        last_email_id=int(str(email.last_email_id))
     )
 
 

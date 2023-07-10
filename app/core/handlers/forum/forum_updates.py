@@ -26,7 +26,7 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
     email_dao = EmailDAO(session=session)
     user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
     await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
-                              mail_address=user_email.mail_address)
+                              email_address=user_email.mail_address)
     user_email = await email_dao.get_email(user_id=user_email.user_id, forum_id=event.chat.id)
 
     await _update_forum_settings(event, bot, i18n)
