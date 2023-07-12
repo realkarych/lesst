@@ -80,7 +80,7 @@ async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
                         await email_dao.set_last_email_id(
                             user_id=email.user_id,
                             email_address=email.mail_address,
-                            last_email_id=not_sent_email_ids[-1])
+                            last_email_id=not_sent_email_ids[0])
 
 
 async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:
