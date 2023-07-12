@@ -16,7 +16,7 @@ class User(BASE):
     registered_date = Column(DateTime(timezone=True), server_default=func.now())  # On /start press
 
     def __repr__(self) -> str:
-        return f"User: {self.id}, {self.username}, {self.firstname} " \
+        return f"User: {self.id}, {self.username}, {self.firstname}, " \
                f"{self.lastname}, {self.language_code}, {self.registered_date}"
 
 
