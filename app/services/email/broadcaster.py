@@ -41,15 +41,20 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) 
                         if email:
                             await _broadcast_email(bot=bot, session=session, email=email,
                                                    forum_id=incoming_email.forum_id)
+                            await email_dao.set_last_email_id(
+                                user_id=user_email_data.user_id,
+                                email_address=user_email_data.mail_address,
+                                last_email_id=incoming_email.mailbox_email_id
+                            )
 
             await incoming_dao.remove_email_message(email_message=incoming_email)
 
 
-async def fetch_incoming_emails(bot: Bot, session_pool: async_sessionmaker) -> None:
+async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
     async with session_pool() as session:
         incoming_dao = IncomingEmailMessageDAO(session)
         email_dao = EmailDAO(session)
-        for email in await email_dao.get_all_emails():
+        for email in await email_dao.get_all_emails_with_forums():
             email: EmailDTO
             with EmailCacheDirectory(user_id=email.user_id) as cache_dir:
                 async with BroadcastMailbox(

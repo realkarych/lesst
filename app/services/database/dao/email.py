@@ -39,8 +39,14 @@ class EmailDAO(BaseDAO[Email]):
             return None
 
     @exception_mapper
-    async def get_all_emails(self) -> list[EmailDTO] | None:
-        return await self.get_all(dto_converter=convert_db_email_to_dto_email)
+    async def get_all_emails_with_forums(self) -> list[EmailDTO] | None:
+        try:
+            result = await self._session.execute(
+                select(Email).where(Email.forum_id != None)
+            )
+            return [convert_db_email_to_dto_email(email) for email in result.scalars()]
+        except NoResultFound:
+            return None
     
     @exception_mapper
     async def get_user_emails(self, user_id: int) -> tuple[EmailDTO] | None:

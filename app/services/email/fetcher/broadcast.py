@@ -32,7 +32,6 @@ class BroadcastMailbox(Mailbox):
     async def get_not_sent_emails_ids(self, last_email_id: int) -> list[int] | None:
         status, data = await self._client.search(EmailFlagPattern.ALL.value)
         all_last_ids = self._get_emails_ids_from_response(data)
-        all_last_ids.reverse()
         ids: list[int] = list()
         for email_id in all_last_ids:
             logging.info(all_last_ids)

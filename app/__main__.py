@@ -82,7 +82,7 @@ def _set_middlewares(dp: Dispatcher, sessionmaker: async_sessionmaker) -> None:
 
 async def _set_schedulers(scheduler: AsyncIOScheduler, bot: Bot, session_pool: async_sessionmaker) -> None:
     scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, session_pool))
-    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(minutes=1), (bot, session_pool))
+    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(minutes=1), (session_pool, ))
 
 
 if __name__ == "__main__":

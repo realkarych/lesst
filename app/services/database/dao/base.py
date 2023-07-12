@@ -67,4 +67,4 @@ class BaseDAO(Generic[Model]):
         :return:
         """
 
-        await self.commit()
+        await self._session.commit()
