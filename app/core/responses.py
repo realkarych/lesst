@@ -9,7 +9,7 @@ from typing import Union
 from aiogram import Bot
 from aiogram import types
 from aiogram.enums import ChatAction, ParseMode
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
     InlineKeyboardMarkup, ReplyKeyboardMarkup, CallbackQuery
@@ -206,7 +206,7 @@ async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_noti
                                              parse_mode=None)
                 if not first_text_batch_id:
                     first_text_batch_id = msg.message_id
-                await asyncio.sleep(1)
+                await asyncio.sleep(2)
     else:
         with suppress(TelegramBadRequest):
             msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
@@ -216,7 +216,7 @@ async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_noti
 
     if email.attachments_paths:
         for attachment_path in email.attachments_paths:
-            with suppress(TelegramBadRequest):
+            with suppress(TelegramBadRequest, TelegramNetworkError, FileNotFoundError):
                 await bot.send_document(chat_id=topic.forum_id,
                                         message_thread_id=topic.topic_id,
                                         reply_to_message_id=first_text_batch_id,

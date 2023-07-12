@@ -36,5 +36,9 @@ class IncomingEmailMessageDAO(BaseDAO[IncomingEmailMessage]):
 
     @exception_mapper
     async def get_email_messages(self, limit: int = 10) -> tuple[IncomingEmailMessageDTO]:
-        result = await self._session.execute(select(IncomingEmailMessage).limit(limit))
+        result = await self._session.execute(
+            select(IncomingEmailMessage).
+            order_by(IncomingEmailMessage.mailbox_email_id).
+            limit(limit)
+        )
         return tuple([convert_db_incoming_email_message_to_dto(topic) for topic in result.scalars()])
