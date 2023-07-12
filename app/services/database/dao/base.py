@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import TypeVar, Type, Generic
+from typing import TypeVar, Type, Generic, Callable
 
 from sqlalchemy import delete, func, Row
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.services.database.base import BASE
 
 Model = TypeVar('Model', BASE, BASE)
+DTO = TypeVar('DTO', BASE, BASE)
 
 
 class BaseDAO(Generic[Model]):
@@ -23,15 +25,17 @@ class BaseDAO(Generic[Model]):
         self._model = model
         self._session = session
 
-    async def get_all(self) -> list[Row[tuple[Model]]]:
+    async def get_all(self, dto_converter: Callable) -> list[DTO] | None:
         """
-        :return: List of dtos.
+        :return: List of models.
         """
+        try:
+            result = await self._session.execute(select(self._model))
+            return [dto_converter(model) for model in result.scalars()]
+        except NoResultFound:
+            return None
 
-        result = await self._session.execute(select(self._model))
-        return [i for i in result.all()]
-
-    async def get_by_id(self, id_: int) -> Model | None:
+    async def get_by_id(self, id_: int) -> DTO | None:
         """
         :param id_: input id
         :return:
@@ -63,4 +67,4 @@ class BaseDAO(Generic[Model]):
         :return:
         """
 
-        await self._session.commit()
+        await self.commit()

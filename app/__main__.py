@@ -18,7 +18,7 @@ from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.navigations.command import set_bot_commands
 from app.core.templates import build_translator_hub
 from app.services.database.connector import setup_get_pool
-from app.services.email.broadcaster import broadcast_incoming_emails
+from app.services.email.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
 from app.settings.config import Config, load_config
 
 
@@ -82,6 +82,7 @@ def _set_middlewares(dp: Dispatcher, sessionmaker: async_sessionmaker) -> None:
 
 async def _set_schedulers(scheduler: AsyncIOScheduler, bot: Bot, session_pool: async_sessionmaker) -> None:
     scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, session_pool))
+    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(minutes=1), (bot, session_pool))
 
 
 if __name__ == "__main__":

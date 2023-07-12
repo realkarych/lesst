@@ -20,19 +20,19 @@ class IncomingEmailMessageDAO(BaseDAO[IncomingEmailMessage]):
     @exception_mapper
     async def add_email_message(self, email_message: IncomingEmailMessageDTO):
         await self._session.merge(email_message.to_db_model())
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def add_email_messages(self, email_messages: Iterable[IncomingEmailMessageDTO]):
         self._session.add_all([email_message.to_db_model() for email_message in email_messages])
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def remove_email_message(self, email_message: IncomingEmailMessageDTO) -> None:
         await self._session.execute(
             delete(IncomingEmailMessage).where(IncomingEmailMessage.id == email_message.email_db_id)
         )
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def get_email_messages(self, limit: int = 10) -> tuple[IncomingEmailMessageDTO]:

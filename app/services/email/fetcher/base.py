@@ -10,6 +10,7 @@ from mailparser import mailparser
 from app.services.email import parser
 from app.services.email.cache import EmailCacheDirectory
 from app.services.email.entities import EmailService, EmailConnectionType, Email
+from app.settings.limits import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
 
 
 class Mailbox:
@@ -23,7 +24,7 @@ class Mailbox:
         self._cache_dir = cache_dir
 
     async def __aenter__(self) -> Mailbox:
-        while connection_attempts := 0 < 10:
+        while connection_attempts := 0 < EMAIL_CONNECTIONS_ATTEMPTS_COUNT:
             with suppress(TimeoutError):
                 self._client = aioimaplib.IMAP4_SSL(
                     host=self._email_service.imap.server,

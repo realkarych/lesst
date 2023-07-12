@@ -19,7 +19,7 @@ class EmailDAO(BaseDAO[Email]):
     @exception_mapper
     async def add_email(self, email: EmailDTO) -> None:
         await self._session.merge(email.to_db_model())
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def email_already_added(self, email_address: str) -> bool:
@@ -35,6 +35,20 @@ class EmailDAO(BaseDAO[Email]):
                 select(Email).where(Email.user_id == user_id, Email.forum_id == forum_id)
             )
             return convert_db_email_to_dto_email(result.scalar_one())
+        except NoResultFound:
+            return None
+
+    @exception_mapper
+    async def get_all_emails(self) -> list[EmailDTO] | None:
+        return await self.get_all(dto_converter=convert_db_email_to_dto_email)
+    
+    @exception_mapper
+    async def get_user_emails(self, user_id: int) -> tuple[EmailDTO] | None:
+        try:
+            result = await self._session.execute(
+                select(Email).where(Email.user_id == user_id)
+            )
+            return tuple([convert_db_email_to_dto_email(email) for email in result.scalars()])
         except NoResultFound:
             return None
 
@@ -56,7 +70,7 @@ class EmailDAO(BaseDAO[Email]):
                 Email.mail_address == email_address).
             values(last_email_id=last_email_id)
         )
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def set_forum(self, user_id: int, email_address: str, forum_id: int) -> None:
@@ -64,4 +78,4 @@ class EmailDAO(BaseDAO[Email]):
             update(Email).where(Email.user_id == user_id, Email.mail_address == email_address).values(
                 forum_id=forum_id
             ))
-        await self._session.commit()
+        await self.commit()

@@ -20,7 +20,7 @@ class TopicDAO(BaseDAO[Topic]):
     @exception_mapper
     async def add_topic(self, topic: TopicDTO):
         await self._session.merge(topic.to_db_model())
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def is_topic_created(self, forum_id: int, email_address: str) -> bool:
@@ -39,7 +39,7 @@ class TopicDAO(BaseDAO[Topic]):
     @exception_mapper
     async def add_topics(self, topics: Iterable[TopicDTO]):
         self._session.add_all([topic.to_db_model() for topic in topics])
-        await self._session.commit()
+        await self.commit()
 
     @exception_mapper
     async def get_topic_ids(self, forum_id: int) -> set[str]:
