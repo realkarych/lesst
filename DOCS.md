@@ -2,13 +2,6 @@
 
 **Aioplate is a universal scalable template for creating Telegram bots on Python Aiogram.**
 
-# Default stack for Aioplate
-
-- **Python 3.11** and higher
-- **Aiogram 3.x**
-- **Aiogram MemoryStorage** for temporary data. You can replace it with **RedisStorage2** & aioredis.
-- **PostgreSQL** (**SQLAlchemy** as an ORM + **asyncpg** as a driver + **alembic** as a migration service).
-
 ## Installation
 
 1) Create repo by this template

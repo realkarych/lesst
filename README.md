@@ -35,3 +35,4 @@
 - APScheduler — аналог crontab — управление регулярными процессами.
 - Systemd — запуск приложения на сервере. Можно заменить Docker-ом.
 - Полный перечень использованных инструментов можно посмотреть в <a href="https://github.com/innerbots/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
+- <a href="https://github.com/innerbots/lesst/blob/main/DOCS.md">*Гайд по установке*</a>
