@@ -31,12 +31,11 @@ class BroadcastMailbox(Mailbox):
 
     async def get_not_sent_emails_ids(self, last_email_id: int) -> list[int] | None:
         status, data = await self._client.search(EmailFlagPattern.ALL.value)
-        all_last_ids = self._get_emails_ids_from_response(data)
+        all_ids = self._get_emails_ids_from_response(data)
         ids: list[int] = list()
-        for email_id in all_last_ids:
-            logging.info(all_last_ids)
+        for email_id in all_ids:
             logging.info(last_email_id)
-            if int(email_id) > last_email_id:
+            if email_id > last_email_id:
                 ids.append(int(email_id))
             else:
                 break
@@ -44,8 +43,8 @@ class BroadcastMailbox(Mailbox):
         return ids if ids else None
 
     @staticmethod
-    def _get_emails_ids_from_response(response_data: tuple) -> list[str]:
+    def _get_emails_ids_from_response(response_data: tuple) -> list[int]:
         data = str(response_data[0]).split()
-        mail_ids = [''.join(filter(str.isdigit, _id)) for _id in data]
+        mail_ids = [int(''.join(filter(str.isdigit, _id))) for _id in data]
         mail_ids.reverse()
         return mail_ids

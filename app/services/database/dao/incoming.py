@@ -24,7 +24,8 @@ class IncomingEmailMessageDAO(BaseDAO[IncomingEmailMessage]):
 
     @exception_mapper
     async def add_email_messages(self, email_messages: Iterable[IncomingEmailMessageDTO]):
-        self._session.add_all([email_message.to_db_model() for email_message in email_messages])
+        for email_message in email_messages:
+            await self._session.merge(email_message.to_db_model())
         await self.commit()
 
     @exception_mapper

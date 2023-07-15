@@ -28,6 +28,8 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) 
             user_email_data = await email_dao.get_email(user_id=incoming_email.user_id,
                                                         forum_id=incoming_email.forum_id)
 
+            await incoming_dao.remove_email_message(email_message=incoming_email)
+
             with EmailCacheDirectory(user_id=user_email_data.user_id) as cache_dir:
                 async with BroadcastMailbox(
                         cache_dir=cache_dir,
@@ -41,13 +43,12 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) 
                         if email:
                             await _broadcast_email(bot=bot, session=session, email=email,
                                                    forum_id=incoming_email.forum_id)
+
                             await email_dao.set_last_email_id(
                                 user_id=user_email_data.user_id,
                                 email_address=user_email_data.mail_address,
                                 last_email_id=incoming_email.mailbox_email_id
                             )
-
-            await incoming_dao.remove_email_message(email_message=incoming_email)
 
 
 async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
@@ -66,7 +67,17 @@ async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
                 ) as mailbox:
                     if mailbox.can_connect():
                         not_sent_email_ids = await mailbox.get_not_sent_emails_ids(last_email_id=email.last_email_id)
+                        if not not_sent_email_ids:
+                            return
+
                         email_messages: list[IncomingEmailMessageDTO] = list()
+
+                        await email_dao.set_last_email_id(
+                            user_id=email.user_id,
+                            email_address=email.mail_address,
+                            last_email_id=not_sent_email_ids[0]
+                        )
+
                         for email_id in not_sent_email_ids:
                             email_messages.append(
                                 IncomingEmailMessageDTO(
@@ -77,10 +88,6 @@ async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
                                 )
                             )
                         await incoming_dao.add_email_messages(email_messages)
-                        await email_dao.set_last_email_id(
-                            user_id=email.user_id,
-                            email_address=email.mail_address,
-                            last_email_id=not_sent_email_ids[0])
 
 
 async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:

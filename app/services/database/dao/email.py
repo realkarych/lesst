@@ -73,7 +73,8 @@ class EmailDAO(BaseDAO[Email]):
         await self._session.execute(
             update(Email).where(
                 Email.user_id == user_id,
-                Email.mail_address == email_address).
+                Email.mail_address == email_address,
+                Email.last_email_id < last_email_id).
             values(last_email_id=last_email_id)
         )
         await self.commit()
