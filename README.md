@@ -31,6 +31,7 @@
 - Python3.11
 - Poetry — менеджер зависимостей.
 - <a href="https://github.com/aiogram/aiogram">Aiogram</a> — асинхронный фреймворк для работы с Telegram BotAPI.
+- <a href="https://nats.io/">Nats</a> — реализация доставки сообщений.
 - <a href="https://projectfluent.org/">Mozilla ProjectFluent</a> — система локализации. Бот работает на английском и русском языках.
 - PostgreSQL (реляционная бд) + SQLalchemy (ORM) + asyncpg (коннектор) + alembic (миграции)
 - Набор инструментов для асинхронной подгрузки Email-ов по IMAP и отправки по SMTP.
