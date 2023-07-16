@@ -51,6 +51,7 @@ async def main() -> None:
         await dp.start_polling(bot, _translator_hub=build_translator_hub(),
                                allowed_updates=dp.resolve_used_update_types())
     finally:
+        scheduler.remove_all_jobs()
         scheduler.shutdown()
         await nats_connection.close()
         await dp.storage.close()
