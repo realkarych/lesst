@@ -32,6 +32,8 @@
    - Stream: `nats stream add`
    - Consumer: `nats consumer add`
    - Bucket: `nats kv add name --history=5 --storage=file`
+   
+   Guide: https://github.com/Vermilonik/HowCreateStreamAndConsumerNats
 
 7) It is highly recommended for deployment (Ubuntu / Debian):
     - Configure app.service file.
