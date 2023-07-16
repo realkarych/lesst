@@ -4,6 +4,7 @@ from contextlib import suppress
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
+from nats.js import JetStreamContext
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.responses import send_topic_email
@@ -18,7 +19,11 @@ from app.services.email.entities import get_service_by_id, Email
 from app.services.email.fetcher.broadcast import BroadcastMailbox
 
 
-async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) -> None:
+async def broadcast_incoming_emails(
+        bot: Bot,
+        session_pool: async_sessionmaker,
+        jetstream_context: JetStreamContext
+) -> None:
     async with session_pool() as session:
         incoming_dao = IncomingEmailMessageDAO(session)
         email_dao = EmailDAO(session)
@@ -51,7 +56,10 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker) 
                             )
 
 
-async def fetch_incoming_emails(session_pool: async_sessionmaker) -> None:
+async def fetch_incoming_emails(
+        session_pool: async_sessionmaker,
+        jetstream_context: JetStreamContext
+) -> None:
     async with session_pool() as session:
         incoming_dao = IncomingEmailMessageDAO(session)
         email_dao = EmailDAO(session)

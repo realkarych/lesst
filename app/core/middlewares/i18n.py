@@ -12,6 +12,6 @@ class TranslatorRunnerMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-        hub: TranslatorHub = data.get('_translator_hub')
-        data['i18n'] = hub.get_translator_by_locale(event.from_user.language_code)
+        hub: TranslatorHub = data.get("_translator_hub")
+        data["i18n"] = hub.get_translator_by_locale(event.from_user.language_code)
         return await handler(event, data)
