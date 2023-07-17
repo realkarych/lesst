@@ -64,7 +64,7 @@ class Mailbox:
             return None
 
         email = mailparser.parse_from_bytes(mail_bytes)
-        soup = BeautifulSoup(" ".join(email.text_html), "html.parser")
+        soup = BeautifulSoup("".join(email.text_html), "html.parser")
 
         text = None
         subject = None
