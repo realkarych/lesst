@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TypeVar, Type, Generic, Callable
 
-from sqlalchemy import delete, func, Row
+from sqlalchemy import delete, func
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from contextlib import suppress
 
 from aiogram import Router, Bot
@@ -46,7 +45,6 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
         return
 
     for email_message in await _get_email_messages(event=event, user_email=user_email):
-        logging.info(email_message)
         await jetstream.publish(subject=consts.STREAM, payload=ormsgpack.packb(email_message))
 
 

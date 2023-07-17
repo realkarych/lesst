@@ -20,8 +20,8 @@ from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.middlewares.nats import JetStreamContextMiddleware
 from app.core.navigations.command import set_bot_commands
 from app.core.templates import build_translator_hub
-from app.services.database.connector import setup_get_pool
 from app.services.broker.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
+from app.services.database.connector import setup_get_pool
 from app.settings.config import Config, load_config
 
 
@@ -34,7 +34,7 @@ async def main() -> None:
     bot = Bot(config.bot.token, parse_mode=config.bot.parse_mode)
     await set_bot_commands(bot=bot)
     dp = Dispatcher(bot=bot, storage=MemoryStorage())
-    
+
     db_session_pool = await setup_get_pool(db_uri=config.db.get_uri())
     nats_connection = await nats.connect(["nats://localhost:4222"])
     jetstream = nats_connection.jetstream()

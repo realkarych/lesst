@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 from contextlib import suppress
 
 from aioimaplib import aioimaplib
@@ -34,12 +33,10 @@ class BroadcastMailbox(Mailbox):
         all_ids = self._get_emails_ids_from_response(data)
         ids: list[int] = list()
         for email_id in all_ids:
-            logging.info(last_email_id)
             if email_id > last_email_id:
                 ids.append(int(email_id))
             else:
                 break
-        logging.info(ids)
         return ids if ids else None
 
     @staticmethod

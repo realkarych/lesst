@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from contextlib import suppress
 
 import dataclass_factory
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
+from nats.errors import ConnectionClosedError
 from nats.js import JetStreamContext
 from ormsgpack import ormsgpack
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -38,6 +40,9 @@ async def broadcast_incoming_emails(
         try:
             pulled_email_messages = await subscriber.fetch(settings.BROADCAST_BATCH_SIZE)
         except TimeoutError:
+            return
+        except ConnectionClosedError:
+            logging.info("Broadcaster shutdown")
             return
 
         for pulled_email_message in pulled_email_messages:
@@ -111,7 +116,12 @@ async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_
         await _create_topic(bot=bot, topic_dao=topic_dao, forum_id=forum_id, email=email)
 
     topic = await topic_dao.get_topic(forum_id=forum_id, email_address=email.from_address)
-    await send_topic_email(bot=bot, email=email, topic=topic)
+
+    try:
+        await send_topic_email(bot=bot, email=email, topic=topic)
+    except TelegramRetryAfter as e:
+        await asyncio.sleep(float(e.retry_after))
+        await _broadcast_email(bot, session, email, forum_id)
 
 
 async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Email):

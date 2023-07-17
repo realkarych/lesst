@@ -190,7 +190,7 @@ async def edit_or_build_email_message(
 async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_notification: bool = False) -> None:
     first_text_batch_id = None
     if email.text:
-        last_text_part_index = len(email.text)-1
+        last_text_part_index = len(email.text) - 1
         for text_part, text_batch in enumerate(email.text):
             if text_part == 0:
                 text = get_first_email_message(email)

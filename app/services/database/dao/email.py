@@ -47,7 +47,7 @@ class EmailDAO(BaseDAO[Email]):
             return [convert_db_email_to_dto_email(email) for email in result.scalars()]
         except NoResultFound:
             return None
-    
+
     @exception_mapper
     async def get_user_emails(self, user_id: int) -> tuple[EmailDTO] | None:
         try:
