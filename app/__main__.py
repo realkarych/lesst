@@ -21,7 +21,7 @@ from app.core.middlewares.nats import JetStreamContextMiddleware
 from app.core.navigations.command import set_bot_commands
 from app.core.templates import build_translator_hub
 from app.services.database.connector import setup_get_pool
-from app.services.email.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
+from app.services.broker.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
 from app.settings.config import Config, load_config
 
 

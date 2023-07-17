@@ -10,7 +10,7 @@ from mailparser import mailparser
 from app.services.email import parser
 from app.services.email.cache import EmailCacheDirectory
 from app.services.email.entities import EmailService, EmailConnectionType, Email
-from app.settings.limits import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
+from app.settings.settings import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
 
 
 class Mailbox:

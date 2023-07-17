@@ -1,6 +1,6 @@
 import re
 
-from app.settings.limits import EMAIL_NODE_SIZE
+from app.settings.settings import EMAIL_NODE_SIZE
 
 
 def form_mail_text_nodes(text: str) -> list[str]:

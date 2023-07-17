@@ -1,7 +1,7 @@
 from app.services.email.cache import EmailCacheDirectory
 from app.services.email.entities import EmailService, EmailFlagPattern
 from app.services.email.fetcher.base import Mailbox
-from app.settings.limits import INITIAL_FETCH_EMAILS_COUNT
+from app.settings.settings import INITIAL_FETCH_EMAILS_COUNT
 
 
 class InitialMailboxFetcher(Mailbox):

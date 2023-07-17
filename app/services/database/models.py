@@ -45,12 +45,3 @@ class Topic(BASE):
     def __repr__(self) -> str:
         return f"Topic: {self.id}, {self.forum_id}, {self.topic_id} " \
                f"{self.topic_name}"
-
-
-class IncomingEmailMessage(BASE):
-    __tablename__ = "incoming_email_messages"
-    id = Column(BigInteger, primary_key=True, unique=True, autoincrement=True)
-    user_id = Column(BigInteger)
-    forum_id = Column(BigInteger)
-    user_email_db_id = Column(BigInteger)  # Email ID in database table "emails"
-    mailbox_email_id = Column(Integer)  # Email ID in mailbox

@@ -16,5 +16,5 @@ class JetStreamContextMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any],
     ) -> Any:
-        data["nats"] = self.context
+        data["jetstream"] = self.context
         return await handler(event, data)

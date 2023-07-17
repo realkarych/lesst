@@ -8,7 +8,7 @@ from aioimaplib import aioimaplib
 
 from app.services.email.entities import EmailFlagPattern
 from app.services.email.fetcher.base import Mailbox
-from app.settings.limits import EMAIL_BROADCASTER_CONNECTIONS_ATTEMPTS_COUNT
+from app.settings.settings import EMAIL_BROADCASTER_CONNECTIONS_ATTEMPTS_COUNT
 
 
 class BroadcastMailbox(Mailbox):
