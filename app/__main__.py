@@ -23,6 +23,7 @@ from app.core.templates import build_translator_hub
 from app.services.broker.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
 from app.services.database.connector import setup_get_pool
 from app.settings.config import Config, load_config
+from app.settings import settings
 
 
 async def main() -> None:
@@ -98,8 +99,16 @@ async def _set_schedulers(
         async_sessionmaker,
         jetstream_context: JetStreamContext
 ) -> None:
-    scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, db_session_pool, jetstream_context))
-    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(seconds=30), (db_session_pool, jetstream_context))
+    scheduler.add_job(
+        broadcast_incoming_emails,
+        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        (bot, db_session_pool, jetstream_context)
+    )
+    scheduler.add_job(
+        fetch_incoming_emails,
+        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        (db_session_pool, jetstream_context)
+    )
 
 
 if __name__ == "__main__":
