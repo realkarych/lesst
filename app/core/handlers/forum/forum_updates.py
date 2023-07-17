@@ -4,27 +4,20 @@ from contextlib import suppress
 
 from aiogram import Router, Bot
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import ChatMemberUpdatedFilter, ADMINISTRATOR, IS_NOT_MEMBER, MEMBER, KICKED
+from aiogram.filters import ChatMemberUpdatedFilter, ADMINISTRATOR, IS_NOT_MEMBER, MEMBER, KICKED, LEFT, RESTRICTED
 from aiogram.types import ChatMemberUpdated, ChatMemberOwner, FSInputFile
 from fluentogram import TranslatorRunner
-from nats.js import JetStreamContext
-from ormsgpack import ormsgpack
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.forum import is_forum
 from app.dtos.email import EmailDTO
-from app.dtos.incoming_email import IncomingEmailMessageDTO
-from app.services.broker import consts
 from app.services.database.dao.email import EmailDAO
-from app.services.email.cache import EmailCacheDirectory
-from app.services.email.entities import get_service_by_id
-from app.services.email.fetcher.initial import InitialMailboxFetcher
 from app.settings import paths
 
 
 @is_forum
 async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession, bot: Bot,
-                                 i18n: TranslatorRunner, jetstream: JetStreamContext) -> None:
+                                 i18n: TranslatorRunner) -> None:
     email_dao = EmailDAO(session=session)
     user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
     await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
@@ -43,31 +36,6 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
         with suppress(TelegramBadRequest):
             await bot.send_message(chat_id=user_email.user_id, text=i18n.forum.no_permissions())
         return
-
-    for email_message in await _get_email_messages(event=event, user_email=user_email):
-        await jetstream.publish(subject=consts.STREAM, payload=ormsgpack.packb(email_message))
-
-
-async def _get_email_messages(event: ChatMemberUpdated, user_email: EmailDTO) -> list[IncomingEmailMessageDTO]:
-    with EmailCacheDirectory(user_id=user_email.user_id) as cache_dir:
-        async with InitialMailboxFetcher(
-                cache_dir=cache_dir,
-                email_address=user_email.mail_address,
-                email_service=get_service_by_id(service_id=user_email.mail_server).value,
-                email_auth_key=user_email.mail_auth_key,
-                user_id=user_email.user_id
-        ) as mailbox:
-            if mailbox.can_connect():
-                emails_ids = await mailbox.get_emails_ids()
-                email_messages: list[IncomingEmailMessageDTO] = list()
-                for email_id in emails_ids:
-                    email_messages.append(IncomingEmailMessageDTO(
-                        forum_id=event.chat.id,
-                        mailbox_email_id=int(email_id),
-                        user_email_db_id=user_email.email_db_id,
-                        user_id=user_email.user_id
-                    ))
-                return email_messages
 
 
 async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: TranslatorRunner) -> None:
@@ -94,8 +62,12 @@ async def _get_user_email(event: ChatMemberUpdated, bot: Bot, email_dao: EmailDA
 
 def register() -> Router:
     router = Router()
+
     router.my_chat_member.register(
         handle_adding_to_forum,
-        ChatMemberUpdatedFilter(member_status_changed=(IS_NOT_MEMBER | MEMBER | KICKED) >> ADMINISTRATOR)
+        ChatMemberUpdatedFilter(
+            member_status_changed=(IS_NOT_MEMBER | MEMBER | KICKED | LEFT | RESTRICTED) >> ADMINISTRATOR
+        )
     )
+
     return router

@@ -78,35 +78,30 @@ async def fetch_incoming_emails(
 ) -> None:
     async with session_pool() as session:
         email_dao = EmailDAO(session)
-        for email in await email_dao.get_all_emails_with_forums():
-            email: EmailDTO
-            with EmailCacheDirectory(user_id=email.user_id) as cache_dir:
-                async with BroadcastMailbox(
-                        cache_dir=cache_dir,
-                        email_address=email.mail_address,
-                        email_service=get_service_by_id(service_id=email.mail_server).value,
-                        email_auth_key=email.mail_auth_key,
-                        user_id=email.user_id
-                ) as mailbox:
-                    if mailbox.can_connect():
-                        not_sent_email_ids = await mailbox.get_not_sent_emails_ids(last_email_id=email.last_email_id)
-                        if not not_sent_email_ids:
-                            return
+        for user_email in await email_dao.get_emails_with_forums():
+            user_email: EmailDTO
 
-                        await email_dao.set_last_email_id(
-                            user_id=email.user_id,
-                            email_address=email.mail_address,
-                            last_email_id=max(not_sent_email_ids)
-                        )
+            not_sent_email_ids = await _get_not_sent_email_ids(user_email=user_email)
+            if not not_sent_email_ids:
+                continue
 
-                        for email_id in not_sent_email_ids:
-                            email_message = IncomingEmailMessageDTO(
-                                forum_id=email.forum_id,
-                                mailbox_email_id=email_id,
-                                user_email_db_id=email.email_db_id,
-                                user_id=email.user_id
-                            )
-                            await jetstream.publish(subject=consts.STREAM, payload=ormsgpack.packb(email_message))
+            # Update last "handled" email-id. "Handled" means: "added to nats queue"
+            await email_dao.set_last_email_id_by_email_id(
+                email_db_id=user_email.email_db_id,
+                last_email_id=max(not_sent_email_ids)
+            )
+
+            for email_id in not_sent_email_ids:
+                email_message = IncomingEmailMessageDTO(
+                    forum_id=user_email.forum_id,
+                    mailbox_email_id=email_id,
+                    user_email_db_id=user_email.email_db_id,
+                    user_id=user_email.user_id
+                )
+                await jetstream.publish(
+                    subject=consts.EMAILS_SUBJECT,
+                    payload=ormsgpack.packb(email_message)
+                )
 
 
 async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:
@@ -134,3 +129,19 @@ async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Ema
                 topic_name=email.from_address
             )
         )
+
+
+async def _get_not_sent_email_ids(user_email: EmailDTO) -> list[int] | None:
+    with EmailCacheDirectory(user_id=user_email.user_id) as cache_dir:
+        async with BroadcastMailbox(
+                cache_dir=cache_dir,
+                email_address=user_email.mail_address,
+                email_service=get_service_by_id(service_id=user_email.mail_server).value,
+                email_auth_key=user_email.mail_auth_key,
+                user_id=user_email.user_id
+        ) as mailbox:
+            if mailbox.can_connect():
+                if user_email.last_email_id == 0:  # No sent emails yet. Realize initial Emails fetching
+                    return await mailbox.get_initial_emails_ids()
+                else:  # There are already sent emails. Trying it out to fetch new Emails
+                    return await mailbox.get_not_sent_emails_ids(last_email_id=user_email.last_email_id)

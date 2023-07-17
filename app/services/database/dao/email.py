@@ -39,7 +39,7 @@ class EmailDAO(BaseDAO[Email]):
             return None
 
     @exception_mapper
-    async def get_all_emails_with_forums(self) -> list[EmailDTO] | None:
+    async def get_emails_with_forums(self) -> list[EmailDTO] | None:
         try:
             result = await self._session.execute(
                 select(Email).where(Email.forum_id != None)
@@ -74,6 +74,16 @@ class EmailDAO(BaseDAO[Email]):
             update(Email).where(
                 Email.user_id == user_id,
                 Email.mail_address == email_address,
+                Email.last_email_id < last_email_id).
+            values(last_email_id=last_email_id)
+        )
+        await self.commit()
+
+    @exception_mapper
+    async def set_last_email_id_by_email_id(self, email_db_id: int, last_email_id: int) -> None:
+        await self._session.execute(
+            update(Email).where(
+                Email.id == email_db_id,
                 Email.last_email_id < last_email_id).
             values(last_email_id=last_email_id)
         )

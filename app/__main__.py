@@ -99,7 +99,7 @@ async def _set_schedulers(
         jetstream_context: JetStreamContext
 ) -> None:
     scheduler.add_job(broadcast_incoming_emails, IntervalTrigger(seconds=10), (bot, db_session_pool, jetstream_context))
-    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(minutes=1), (db_session_pool, jetstream_context))
+    scheduler.add_job(fetch_incoming_emails, IntervalTrigger(seconds=30), (db_session_pool, jetstream_context))
 
 
 if __name__ == "__main__":

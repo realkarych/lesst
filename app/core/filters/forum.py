@@ -5,15 +5,13 @@ from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatMemberUpdated, ChatMemberOwner
 from fluentogram import TranslatorRunner
-from nats.js import JetStreamContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def is_forum(handler: callable) -> Callable[[ChatMemberUpdated], Coroutine]:
-    async def wrapper(event: ChatMemberUpdated, session: AsyncSession, bot: Bot, i18n: TranslatorRunner,
-                      jetstream: JetStreamContext):
+    async def wrapper(event: ChatMemberUpdated, session: AsyncSession, bot: Bot, i18n: TranslatorRunner):
         if event.chat.is_forum:
-            return await handler(event, session, bot, i18n, jetstream)
+            return await handler(event, session, bot, i18n)
 
         with suppress(TelegramBadRequest):
             await bot.send_message(chat_id=await _get_owner_id(event, bot), text=i18n.forum.not_forum)
