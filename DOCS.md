@@ -25,14 +25,14 @@
     - Run app: `poetry run app`
     - Update dependencies*: `poetry update`
 6) Configure nats-server:
-   - Install nats-server: https://docs.nats.io/running-a-nats-service/introduction/installation.
-   - Install nats-cli: https://github.com/nats-io/natscli/.
-   - Install nats-top: https://github.com/nats-io/nats-top/releases.
-   - Server: `nats-server -c nats.conf`
-   - Stream: `nats stream add`
-   - Consumer: `nats consumer add`
-   - Bucket: `nats kv add name --history=5 --storage=file`
-   
+    - Install nats-server: https://docs.nats.io/running-a-nats-service/introduction/installation.
+    - Install nats-cli: https://github.com/nats-io/natscli/.
+    - Install nats-top: https://github.com/nats-io/nats-top/releases.
+    - Server: `nats-server -c nats.conf`
+    - Stream: `nats stream add`
+    - Consumer: `nats consumer add`
+    - Bucket: `nats kv add name --history=5 --storage=file`
+
    Guide: https://github.com/Vermilonik/HowCreateStreamAndConsumerNats
 
 7) It is highly recommended for deployment (Ubuntu / Debian):
