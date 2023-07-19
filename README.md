@@ -1,5 +1,6 @@
 # <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
 
+Автор: Карчевский Андрей (Karych).
 ## Описание проекта
 
 Полноценный почтовый клиент в Telegram. На базе Telegram BotAPI
