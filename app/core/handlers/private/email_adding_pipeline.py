@@ -28,7 +28,7 @@ async def cbq_email_service(c: types.CallbackQuery, callback_data: EmailServiceC
                             i18n: TranslatorRunner, state: FSMContext):
     service = get_service_by_id(service_id=callback_data.service_id)
     await c.message.edit_text(i18n.auth.enter_email(email_service=service.value.title),
-                              reply_markup=inline.return_to_services)
+                              reply_markup=inline.return_to_services(i18n))
     await state.update_data({cb_ids.EMAIL_SERVICE: service})
     await state.update_data({cb_ids.EMAIL_PIPELINE_MESSAGE: c.message.message_id})
     await state.set_state(EmailAuth.email)
@@ -49,7 +49,7 @@ async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: Tran
     photo_message = await m.answer_photo(
         photo=FSInputFile(path=get_imap_image_path(data.get(cb_ids.EMAIL_SERVICE))),
         caption=enter_password_message(data.get(cb_ids.EMAIL_SERVICE), i18n),
-        reply_markup=inline.return_to_email
+        reply_markup=inline.return_to_email(i18n)
     )
 
     await state.update_data({cb_ids.EMAIL: email})
@@ -82,7 +82,7 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
 
     await m.answer_photo(photo=FSInputFile(path=paths.ACTIVATE_TOPICS_IMAGE_PATH), caption=i18n.auth.create_group())
     await m.answer_photo(photo=FSInputFile(path=paths.GROUP_SETTINGS_IMAGE_PATH), caption=i18n.auth.add_to_chat(),
-                         reply_markup=inline.add_to_chat)
+                         reply_markup=inline.add_to_chat(i18n))
 
 
 async def back_to_email_services(c: types.CallbackQuery, bot: Bot, i18n: TranslatorRunner, state: FSMContext):
@@ -107,10 +107,10 @@ async def back_to_email(c: types.CallbackQuery, bot: Bot, state: FSMContext, i18
     try:
         await bot.edit_message_text(message_id=msg_id,
                                     text=i18n.auth.enter_email(email_service=service.value.title),
-                                    reply_markup=inline.return_to_services)
+                                    reply_markup=inline.return_to_services(i18n))
     except TelegramBadRequest:
         new_msg = await c.message.answer(text=i18n.auth.enter_email(email_service=service.value.title),
-                                         reply_markup=inline.return_to_services)
+                                         reply_markup=inline.return_to_services(i18n))
         await state.update_data({cb_ids.EMAIL_PIPELINE_MESSAGE: new_msg.message_id})
 
     await state.update_data({cb_ids.MESSAGE_TO_REMOVE_ID: c.message.message_id})

@@ -25,7 +25,7 @@ def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
 
         await edit_or_build_email_message(
             bot=bot, m=m, text=i18n.auth.incorrect_email(email_service=data.get(EMAIL_SERVICE).value.title),
-            markup=inline.return_to_services,
+            markup=inline.return_to_services(i18n),
             message_id=data.get(EMAIL_PIPELINE_MESSAGE),
             state=state
         )
@@ -44,7 +44,7 @@ def new_email(handler: callable) -> Callable[[Message], Coroutine]:
 
         await edit_or_build_email_message(
             bot=bot, m=m, text=i18n.auth.incorrect_email(email_service=data.get(EMAIL_SERVICE).value.title),
-            markup=inline.return_to_services,
+            markup=inline.return_to_services(i18n),
             message_id=data.get(EMAIL_PIPELINE_MESSAGE),
             state=state
         )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import update, select, delete
+from sqlalchemy import update, select, delete, func
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,6 +57,11 @@ class EmailDAO(BaseDAO[Email]):
             return tuple([converters.db_email_to_dto(email) for email in result.scalars()])
         except NoResultFound:
             return None
+
+    @exception_mapper
+    async def get_user_emails_count(self, user_id: int) -> int:
+        result = await self._session.execute(select(func.count(Email)).where(Email.user_id == user_id))
+        return result.scalar_one()
 
     @exception_mapper
     async def get_email_without_forum(self, user_id: int) -> EmailDTO | None:

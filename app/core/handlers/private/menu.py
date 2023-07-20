@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import messages
 from app.core.filters.chat_type import ChatTypeFilter
+from app.core.filters.limiter import limits_not_reached
 from app.core.keyboards import reply, inline
 from app.core.navigations import reply as reply_callbacks
 from app.core.navigations.command import Commands
@@ -38,8 +39,8 @@ async def cmd_cancel(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRu
     await send_response(m, bot, text=i18n.cancel(), markup=reply.menu(i18n))
 
 
-async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner,
-                            state: FSMContext):
+@limits_not_reached
+async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner, state: FSMContext):
     data = await state.get_data()
     await m.delete()
     with suppress(TelegramBadRequest):

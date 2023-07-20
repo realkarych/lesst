@@ -48,6 +48,10 @@ auth-add_to_chat = <b>2.</b> Tap on button and add bot to created group.
                    Give access rights, marked on picture.
 
                    <i>(You can give all rights, if you want)</i>
+auth-emails_count_limit_exceeded = You can't add new Email, because in your tariff, you can connect only { $max_emails_count } Emails.
+
+                                   — To add new, you should delete one of the added yet. Press "My Emails" button
+                                   — If you want increase limits, press "Subscription" button
 forum-general_topic_name = Service messages
 forum-email_not_added = Before adding a bot to a group, you need to connect your email to the bot. Go to the @mail_inbot PM and click /start
 forum-group_added = ✔️ The group has been added successfully. Emails will be uploaded to the sidebar within a few minutes. The more emails you have, the longer the process will take.

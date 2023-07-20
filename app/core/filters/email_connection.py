@@ -44,7 +44,7 @@ def connection_success(handler: callable) -> Callable[[Message], Coroutine]:
         )
         password_message = await m.answer(
             enter_password_message(email_service=data.get(EMAIL_SERVICE), i18n=i18n),
-            reply_markup=inline.return_to_email,
+            reply_markup=inline.return_to_email(i18n),
             disable_web_page_preview=True
         )
 
