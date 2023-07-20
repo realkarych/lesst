@@ -40,9 +40,13 @@ def get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices
             return i18n.auth.set_imap_params.mail_ru(email_service=email_service.value.title, email=email)
 
 
-def get_first_email_message(email: Email) -> str:
+def first_email_message(email: Email) -> str:
     return f"{email.from_name}: {email.subject}\n\n{email.text[0]}"
 
 
-def get_first_email_message_without_text(email: Email) -> str:
+def last_email_message(email: Email) -> str:
+    return f"{email.text[-1]}\n\n{email.date}"
+
+
+def email_message_without_text(email: Email) -> str:
     return f"{email.from_name}: {email.subject}\n\n{email.date}"

@@ -51,6 +51,6 @@ class BroadcastMailbox(Mailbox):
         data = str(response_data[0]).split()
         email_ids = [int(''.join(filter(str.isdigit, _id))) for _id in data]
         # Bug in API. Last Email id doesn't fetch.
-        email_ids.append(max(email_ids)+1)
+        email_ids.append(max(email_ids) + 1)
         email_ids.reverse()
         return email_ids

@@ -14,7 +14,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo, Message, \
     InlineKeyboardMarkup, ReplyKeyboardMarkup, CallbackQuery
 
-from app.core.messages import get_first_email_message, get_first_email_message_without_text
+from app.core import messages
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
 from app.dtos.topic import TopicDTO
 from app.exceptions import UnexpectedError, AppException
@@ -193,24 +193,22 @@ async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_noti
         last_text_part_index = len(email.text) - 1
         for text_part, text_batch in enumerate(email.text):
             if text_part == 0:
-                text = get_first_email_message(email)
+                text = messages.first_email_message(email)
             else:
                 text = text_batch
             if text_part == last_text_part_index:
-                text = f"{text}\n\n{email.date}"
+                text = messages.last_email_message(email)
 
             with suppress(TelegramBadRequest):
                 msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                             text=text,
-                                             disable_notification=disable_notification,
-                                             parse_mode=None)
+                                             text=text, disable_notification=disable_notification, parse_mode=None)
                 if not first_text_batch_id:
                     first_text_batch_id = msg.message_id
                 await asyncio.sleep(2)
     else:
         with suppress(TelegramBadRequest):
             msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                         text=get_first_email_message_without_text(email),
+                                         text=messages.email_message_without_text(email),
                                          disable_notification=disable_notification)
             first_text_batch_id = msg.message_id
 
