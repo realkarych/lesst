@@ -21,19 +21,24 @@ def email_services() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-return_to_services = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🔙 Вернуться к Email-сервисам", callback_data="return_to_services")]
-])
+def return_to_services(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=i18n.button.back_to_email_services(), callback_data="return_to_services")]
+    ])
 
-return_to_email = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🔙 Вернуться к Email", callback_data="return_to_email")]
-])
 
-add_to_chat = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text="Добавить в чат", url="tg://resolve?domain=lesstrobot&startgroup")]
-    ]
-)
+def return_to_email(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=i18n.button.back_to_email_address(), callback_data="return_to_email")]
+    ])
+
+
+def add_to_chat(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=i18n.button.add_to_chat(), url="tg://resolve?domain=lesstrobot&startgroup")]
+        ]
+    )
 
 
 def remove_email(i18n: TranslatorRunner, email: EmailDTO) -> InlineKeyboardMarkup:

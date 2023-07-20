@@ -61,3 +61,6 @@ forum-not_forum = Bot added, but "Topics" are disabled. How to fix:
                   3) Add bot to group again
 forum-bot_removed = The bot has been removed from forum. Add the bot again and provide admin rights
 button-remove_email = Remove Email
+button-back_to_email_services = 🔙 Back to Email-services
+button-back_to_email_address = 🔙 Back to Email
+button-add_to_chat = Add to chat
