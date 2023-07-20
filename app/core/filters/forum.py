@@ -14,7 +14,7 @@ def is_forum(handler: callable) -> Callable[[ChatMemberUpdated], Coroutine]:
             return await handler(event, session, bot, i18n)
 
         with suppress(TelegramBadRequest):
-            await bot.send_message(chat_id=await _get_owner_id(event, bot), text=i18n.forum.not_forum)
+            await bot.send_message(chat_id=await _get_owner_id(event, bot), text=i18n.forum.not_forum())
         return
 
     return wrapper

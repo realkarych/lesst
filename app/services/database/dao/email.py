@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import update, select
+from sqlalchemy import update, select, delete
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -104,5 +104,12 @@ class EmailDAO(BaseDAO[Email]):
             update(Email).where(Email.user_id == user_id, Email.mail_address == email_address).values(
                 forum_id=None
             )
+        )
+        await self.commit()
+
+    @exception_mapper
+    async def remove_email(self, user_id: int, email_address: str) -> None:
+        await self._session.execute(
+            delete(Email).where(Email.user_id == user_id, Email.mail_address == email_address)
         )
         await self.commit()

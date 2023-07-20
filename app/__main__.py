@@ -83,6 +83,7 @@ def _set_middlewares(dp: Dispatcher, db_session_pool: async_sessionmaker, jetstr
     dp.my_chat_member.outer_middleware(DbSessionMiddleware(db_session_pool))
     dp.message.outer_middleware(DbSessionMiddleware(db_session_pool))
     dp.edited_message.outer_middleware(DbSessionMiddleware(db_session_pool))
+    dp.callback_query.middleware(DbSessionMiddleware(db_session_pool))
 
     dp.my_chat_member.middleware(TranslatorRunnerMiddleware())
     dp.message.middleware(TranslatorRunnerMiddleware())

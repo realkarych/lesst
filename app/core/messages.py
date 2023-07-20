@@ -6,7 +6,8 @@ from aiogram.exceptions import TelegramBadRequest
 from fluentogram import TranslatorRunner
 
 from app.core import urls
-from app.services.email.entities import EmailServices, Email
+from app.dtos.email import EmailDTO
+from app.services.email.entities import EmailServices, Email, get_service_by_id
 
 
 async def remove_messages(chat_id: int, bot: Bot, ids: Iterable[int]) -> None:
@@ -50,3 +51,10 @@ def last_email_message(email: Email) -> str:
 
 def email_message_without_text(email: Email) -> str:
     return f"{email.from_name}: {email.subject}\n\n{email.date}"
+
+
+def get_email_info(email: EmailDTO) -> str:
+    return f"<b>Сервер:</b> <code>{get_service_by_id(email.mail_server).value.title}</code>\n" \
+           f"<b>Email:</b> <code>{email.mail_address}</code>\n" \
+           f"<b>Ключ доступа:</b> <span class=\"tg-spoiler\">{email.mail_auth_key}</span>\n" \
+           f"<b>ID Форума:</b> <code>{email.forum_id}</code>"
