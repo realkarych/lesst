@@ -4,7 +4,8 @@ from contextlib import suppress
 
 from aiogram import Router, Bot
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import ChatMemberUpdatedFilter, ADMINISTRATOR, IS_NOT_MEMBER, MEMBER, KICKED, LEFT, RESTRICTED
+from aiogram.filters import (ChatMemberUpdatedFilter, ADMINISTRATOR, IS_NOT_MEMBER,
+                             MEMBER, KICKED, LEFT, RESTRICTED, CREATOR)
 from aiogram.types import ChatMemberUpdated, ChatMemberOwner, FSInputFile
 from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,6 +39,15 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
         return
 
 
+async def handle_bot_removed_from_forum(event: ChatMemberUpdated, session: AsyncSession, bot: Bot,
+                                        i18n: TranslatorRunner) -> None:
+    email_dao = EmailDAO(session=session)
+    user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
+    await email_dao.unset_forum(user_id=user_email.user_id, email_address=user_email.mail_address)
+    with suppress(TelegramBadRequest):
+        await bot.send_message(chat_id=user_email.user_id, text=i18n.forum.bot_removed())
+
+
 async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: TranslatorRunner) -> None:
     with suppress(TelegramBadRequest):
         await bot.set_chat_photo(chat_id=event.chat.id, photo=FSInputFile(path=paths.BOT_LOGO_IMAGE_PATH))
@@ -66,7 +76,14 @@ def register() -> Router:
     router.my_chat_member.register(
         handle_adding_to_forum,
         ChatMemberUpdatedFilter(
-            member_status_changed=(IS_NOT_MEMBER | MEMBER | KICKED | LEFT | RESTRICTED) >> ADMINISTRATOR
+            member_status_changed=(IS_NOT_MEMBER | MEMBER | KICKED | LEFT | RESTRICTED) >> (ADMINISTRATOR | CREATOR)
+        )
+    )
+
+    router.my_chat_member.register(
+        handle_bot_removed_from_forum,
+        ChatMemberUpdatedFilter(
+            member_status_changed=(ADMINISTRATOR | CREATOR) >> (IS_NOT_MEMBER | KICKED | LEFT)
         )
     )
 

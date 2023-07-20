@@ -94,5 +94,15 @@ class EmailDAO(BaseDAO[Email]):
         await self._session.execute(
             update(Email).where(Email.user_id == user_id, Email.mail_address == email_address).values(
                 forum_id=forum_id
-            ))
+            )
+        )
+        await self.commit()
+
+    @exception_mapper
+    async def unset_forum(self, user_id: int, email_address: str) -> None:
+        await self._session.execute(
+            update(Email).where(Email.user_id == user_id, Email.mail_address == email_address).values(
+                forum_id=None
+            )
+        )
         await self.commit()
