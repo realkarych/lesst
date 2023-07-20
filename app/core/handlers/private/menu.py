@@ -17,7 +17,6 @@ from app.core.filters.limiter import limits_not_reached
 from app.core.keyboards import reply, inline
 from app.core.navigations import reply as reply_callbacks
 from app.core.navigations.command import Commands
-from app.core.responses import send_response
 from app.core.states import callbacks as inline_callbacks
 from app.core.states.callbackdata_ids import MESSAGE_TO_REMOVE_ID
 from app.core.states.mail_authorization import EmailAuth
@@ -26,7 +25,7 @@ from app.services.database.dao.email import EmailDAO
 from app.services.database.dao.user import UserDAO
 
 
-async def cmd_start(m: Message, bot: Bot, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
+async def cmd_start(m: Message, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
     await state.clear()
     await _add_user_to_db(session=session, message=m)
     with suppress(TelegramBadRequest):
@@ -41,9 +40,9 @@ async def cmd_start(m: Message, bot: Bot, i18n: TranslatorRunner, session: Async
     await state.set_data({MESSAGE_TO_REMOVE_ID: message.message_id})
 
 
-async def cmd_cancel(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner):
+async def cmd_cancel(m: Message, state: FSMContext, i18n: TranslatorRunner):
     await state.clear()
-    await send_response(m, bot, text=i18n.cancel(), markup=reply.menu(i18n))
+    await m.answer(text=i18n.cancel(), markup=reply.menu(i18n))
 
 
 @limits_not_reached
@@ -56,7 +55,10 @@ async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner, state:
                 chat_id=m.from_user.id,  # type: ignore
                 message_id=data.get(MESSAGE_TO_REMOVE_ID)
             )
-    await send_response(m, bot, text=i18n.auth.choose_email_service(), markup=inline.email_services())
+    await m.answer(
+        text=i18n.auth.choose_email_service(),
+        reply_markup=inline.email_services()
+    )
     await state.set_state(EmailAuth.service)
 
 

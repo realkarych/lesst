@@ -11,6 +11,7 @@ from fluentogram import TranslatorRunner
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.forum import is_forum
+from app.core.keyboards import reply
 from app.dtos.email import EmailDTO
 from app.services.database.dao.email import EmailDAO
 from app.settings import paths
@@ -21,6 +22,8 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
                                  i18n: TranslatorRunner) -> None:
     email_dao = EmailDAO(session=session)
     user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
+    if not user_email:
+        return
     await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
                               email_address=user_email.mail_address)
     user_email = await email_dao.get_email(user_id=user_email.user_id, forum_id=event.chat.id)
@@ -43,10 +46,15 @@ async def handle_bot_removed_from_forum(event: ChatMemberUpdated, session: Async
                                         i18n: TranslatorRunner) -> None:
     email_dao = EmailDAO(session=session)
     user_email = await email_dao.get_email(user_id=event.from_user.id, forum_id=event.chat.id)
-    print(user_email)
+    if not user_email:
+        return
     await email_dao.unset_forum(user_id=user_email.user_id, email_address=user_email.mail_address)
     with suppress(TelegramBadRequest):
-        await bot.send_message(chat_id=user_email.user_id, text=i18n.forum.bot_removed())
+        await bot.send_message(
+            chat_id=user_email.user_id,
+            text=i18n.forum.bot_removed(),
+            reply_markup=reply.menu(i18n)
+        )
 
 
 async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: TranslatorRunner) -> None:

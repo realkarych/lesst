@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.filters.chat_type import ChatTypeFilter
 from app.core.filters.email_connection import connection_success
 from app.core.filters.email_validator import valid_email, new_email
-from app.core.keyboards import inline
+from app.core.keyboards import inline, reply
 from app.core.messages import enter_password_message, get_imap_params_message, remove_messages
 from app.core.responses import edit_or_build_email_message
 from app.core.states import callbackdata_ids as cb_ids
@@ -87,9 +87,16 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
     )
     await state.clear()
 
-    await m.answer_photo(photo=FSInputFile(path=paths.ACTIVATE_TOPICS_IMAGE_PATH), caption=i18n.auth.create_group())
-    await m.answer_photo(photo=FSInputFile(path=paths.GROUP_SETTINGS_IMAGE_PATH), caption=i18n.auth.add_to_chat(),
-                         reply_markup=inline.add_to_chat(i18n))
+    await m.answer_photo(
+        photo=FSInputFile(path=paths.ACTIVATE_TOPICS_IMAGE_PATH),
+        caption=i18n.auth.create_group(),
+        reply_markup=reply.menu(i18n)
+    )
+    await m.answer_photo(
+        photo=FSInputFile(path=paths.GROUP_SETTINGS_IMAGE_PATH),
+        caption=i18n.auth.add_to_chat(),
+        reply_markup=inline.add_to_chat(i18n)
+    )
 
 
 async def back_to_email_services(c: types.CallbackQuery, bot: Bot, i18n: TranslatorRunner, state: FSMContext):
