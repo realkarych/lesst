@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import asyncio
+import email
 from contextlib import suppress
 
 from aioimaplib import aioimaplib
-from bs4 import BeautifulSoup
 from mailparser import mailparser
 
 from app.services.email import parser
 from app.services.email.cache import EmailCacheDirectory
 from app.services.email.entities import EmailService, EmailConnectionType, Email
+from app.services.email.parser import get_email_text
 from app.settings.settings import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
 
 
@@ -63,25 +64,23 @@ class Mailbox:
         if not response_200:
             return None
 
-        email = mailparser.parse_from_bytes(mail_bytes)
-        soup = BeautifulSoup("".join(email.text_html), "html.parser")
+        letter = mailparser.parse_from_bytes(mail_bytes)
 
-        text = None
         subject = None
 
-        if soup.text:
-            text = parser.form_mail_text_nodes(soup.get_text())
-        if email.subject:
-            subject = email.subject
+        text = parser.form_mail_text_nodes(get_email_text(email.message_from_bytes(mail_bytes)))
 
-        attachments_paths = self._cache_dir.save_attachments(email=email, email_id=int(email_id))
+        if letter.subject:
+            subject = letter.subject
+
+        attachments_paths = self._cache_dir.save_attachments(email=letter, email_id=int(email_id))
 
         return Email(
             id_=email_id,
-            from_name=email.from_[0][0],
-            from_address=email.from_[0][1],
+            from_name=letter.from_[0][0],
+            from_address=letter.from_[0][1],
             to_=self._email_address,
-            date=email.date,
+            date=letter.date,
             subject=subject,
             text=text,
             attachments_paths=attachments_paths

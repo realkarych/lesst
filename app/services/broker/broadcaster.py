@@ -48,6 +48,9 @@ async def broadcast_incoming_emails(
         for pulled_email_message in pulled_email_messages:
             email_message = factory.load(ormsgpack.unpackb(pulled_email_message.data), IncomingEmailMessageDTO)
             user_mailbox = await email_dao.get_email(user_id=email_message.user_id, forum_id=email_message.forum_id)
+            if not user_mailbox:
+                await pulled_email_message.ack()
+                continue
 
             await email_dao.set_last_email_id(
                 user_id=user_mailbox.user_id,
@@ -64,10 +67,13 @@ async def broadcast_incoming_emails(
                         user_id=email_message.user_id
                 ) as mailbox:
                     if mailbox.can_connect():
-                        email = await mailbox.get_email(email_id=str(email_message.mailbox_email_id))
-                        if email:
-                            await _broadcast_email(bot=bot, session=session, email=email,
-                                                   forum_id=email_message.forum_id)
+                        try:
+                            email = await mailbox.get_email(email_id=str(email_message.mailbox_email_id))
+                            if email:
+                                await _broadcast_email(bot=bot, session=session, email=email,
+                                                       forum_id=email_message.forum_id)
+                        except Exception as error:
+                            logging.error(error)
 
             await pulled_email_message.ack()
 
