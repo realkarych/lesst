@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dtos import converters
 from app.dtos.user import UserDTO
 from app.services.database.dao.base import BaseDAO
 from app.services.database.exception_mapper import exception_mapper
