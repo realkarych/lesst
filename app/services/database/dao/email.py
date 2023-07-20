@@ -4,7 +4,7 @@ from sqlalchemy import update, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dtos.converters import convert_db_email_to_dto_email
+from app.dtos import converters
 from app.dtos.email import EmailDTO
 from app.services.database.dao.base import BaseDAO
 from app.services.database.exception_mapper import exception_mapper
@@ -34,7 +34,7 @@ class EmailDAO(BaseDAO[Email]):
             result = await self._session.execute(
                 select(Email).where(Email.user_id == user_id, Email.forum_id == forum_id)
             )
-            return convert_db_email_to_dto_email(result.scalar_one())
+            return converters.db_email_to_dto(result.scalar_one())
         except NoResultFound:
             return None
 
@@ -44,7 +44,7 @@ class EmailDAO(BaseDAO[Email]):
             result = await self._session.execute(
                 select(Email).where(Email.forum_id != None)
             )
-            return [convert_db_email_to_dto_email(email) for email in result.scalars()]
+            return [converters.db_email_to_dto(email) for email in result.scalars()]
         except NoResultFound:
             return None
 
@@ -54,7 +54,7 @@ class EmailDAO(BaseDAO[Email]):
             result = await self._session.execute(
                 select(Email).where(Email.user_id == user_id)
             )
-            return tuple([convert_db_email_to_dto_email(email) for email in result.scalars()])
+            return tuple([converters.db_email_to_dto(email) for email in result.scalars()])
         except NoResultFound:
             return None
 
@@ -64,7 +64,7 @@ class EmailDAO(BaseDAO[Email]):
             result = await self._session.execute(
                 select(Email).where(Email.user_id == user_id, Email.forum_id == None)
             )
-            return convert_db_email_to_dto_email(result.scalar_one())
+            return converters.db_email_to_dto(result.scalar_one())
         except NoResultFound:
             return None
 

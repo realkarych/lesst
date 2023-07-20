@@ -7,7 +7,7 @@ from app.services import cryptography
 from app.services.database.models import User, Email, Topic
 
 
-def convert_db_user_to_dto_user(user: User) -> UserDTO:
+def db_user_to_dto(user: User) -> UserDTO:
     return UserDTO(
         id=int(str(user.id)),
         username=str(user.username),
@@ -18,7 +18,7 @@ def convert_db_user_to_dto_user(user: User) -> UserDTO:
     )
 
 
-def convert_db_email_to_dto_email(email: Email) -> EmailDTO:
+def db_email_to_dto(email: Email) -> EmailDTO:
     return EmailDTO(
         email_db_id=int(str(email.id)),
         user_id=int(str(email.user_id)),
@@ -30,7 +30,7 @@ def convert_db_email_to_dto_email(email: Email) -> EmailDTO:
     )
 
 
-def convert_db_topic_to_dto_topic(topic: Topic) -> TopicDTO:
+def db_topic_to_dto(topic: Topic) -> TopicDTO:
     return TopicDTO(
         topic_db_id=int(str(topic.id)),
         topic_id=int(str(topic.topic_id)),
