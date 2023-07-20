@@ -51,7 +51,13 @@ async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner, state:
 
 async def btn_my_emails(m: Message, session: AsyncSession, i18n: TranslatorRunner):
     emails_dao = EmailDAO(session)
-    emails = await emails_dao.get_user_emails(m.from_user.id)
+    emails = await emails_dao.get_user_emails(m.from_user.id)  # type: ignore
+    if not emails:
+        await m.answer(
+            text=i18n.auth.no_added_emails(),
+            reply_markup=reply.menu(i18n)
+        )
+        return
     for email in emails:
         await m.answer(
             text=messages.get_email_info(email),
@@ -66,7 +72,7 @@ async def cbq_remove_email(c: CallbackQuery, bot: Bot, session: AsyncSession,
         user_id=callback_data.user_id,
         email_address=callback_data.email_address
     )
-    await bot.delete_message(chat_id=c.from_user.id, message_id=c.message.message_id)
+    await bot.delete_message(chat_id=c.from_user.id, message_id=c.message.message_id)  # type: ignore
 
 
 def register() -> Router:

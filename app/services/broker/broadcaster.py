@@ -9,7 +9,7 @@ from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
 from nats.errors import ConnectionClosedError
 from nats.js import JetStreamContext
-from ormsgpack import ormsgpack
+from ormsgpack import ormsgpack  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.responses import send_topic_email
@@ -84,7 +84,11 @@ async def fetch_incoming_emails(
 ) -> None:
     async with session_pool() as session:
         email_dao = EmailDAO(session)
-        for user_email in await email_dao.get_emails_with_forums():
+        emails_with_forums = await email_dao.get_emails_with_forums()
+        if not emails_with_forums:
+            return
+
+        for user_email in emails_with_forums:
             user_email: EmailDTO
 
             not_sent_email_ids = await _get_not_sent_email_ids(user_email=user_email)
@@ -93,15 +97,15 @@ async def fetch_incoming_emails(
 
             # Update last "handled" email-id. "Handled" means: "added to nats queue"
             await email_dao.set_last_email_id_by_email_id(
-                email_db_id=user_email.email_db_id,
+                email_db_id=int(str(user_email.email_db_id)),
                 last_email_id=max(not_sent_email_ids)
             )
 
             for email_id in not_sent_email_ids:
                 email_message = IncomingEmailMessageDTO(
-                    forum_id=user_email.forum_id,
+                    forum_id=int(str(user_email.forum_id)),
                     mailbox_email_id=email_id,
-                    user_email_db_id=user_email.email_db_id,
+                    email_db_id=user_email.email_db_id,
                     user_id=user_email.user_id
                 )
                 await jetstream.publish(

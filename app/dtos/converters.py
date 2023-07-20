@@ -22,7 +22,7 @@ def db_email_to_dto(email: Email) -> EmailDTO:
     return EmailDTO(
         email_db_id=int(str(email.id)),
         user_id=int(str(email.user_id)),
-        forum_id=int(str(email.forum_id)) if email.forum_id else None,
+        forum_id=int(str(email.forum_id)) if bool(email.forum_id) else None,
         mail_server=str(email.mail_server),
         mail_address=str(email.mail_address),
         mail_auth_key=cryptography.decrypt_key(str(email.mail_auth_key)),

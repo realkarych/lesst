@@ -23,7 +23,3 @@ class UserDAO(BaseDAO[User]):
 
         await self._session.merge(user.to_db_model())
         await self.commit()
-
-    @exception_mapper
-    async def get_all_users(self) -> tuple[UserDTO] | None:
-        return await self.get_all(dto_converter=converters.db_user_to_dto)

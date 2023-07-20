@@ -68,7 +68,11 @@ class Mailbox:
 
         subject = None
 
-        text = parser.form_mail_text_nodes(get_email_text(email.message_from_bytes(mail_bytes)))
+        all_text = get_email_text(email.message_from_bytes(mail_bytes))
+        if all_text:
+            text_nodes = parser.form_mail_text_nodes(all_text)
+        else:
+            text_nodes = None
 
         if letter.subject:
             subject = letter.subject
@@ -76,12 +80,12 @@ class Mailbox:
         attachments_paths = self._cache_dir.save_attachments(email=letter, email_id=int(email_id))
 
         return Email(
-            id_=email_id,
-            from_name=letter.from_[0][0],
-            from_address=letter.from_[0][1],
-            to_=self._email_address,
+            id_=str(email_id),
+            from_name=str(letter.from_[0][0]),
+            from_address=str(letter.from_[0][1]),
+            to_=str(self._email_address),
             date=letter.date,
-            subject=subject,
-            text=text,
+            subject=str(subject),
+            text=text_nodes,
             attachments_paths=attachments_paths
         )

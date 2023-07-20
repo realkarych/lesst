@@ -1,6 +1,6 @@
-from aiogram.utils.keyboard import (
-    InlineKeyboardMarkup, InlineKeyboardBuilder, InlineKeyboardButton
-)
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from fluentogram import TranslatorRunner
 
 from app.core.states.callbacks import EmailServiceCallbackFactory, UserEmailCallbackFactory

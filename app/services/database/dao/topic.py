@@ -42,7 +42,7 @@ class TopicDAO(BaseDAO[Topic]):
         await self.commit()
 
     @exception_mapper
-    async def get_topic_ids(self, forum_id: int) -> set[str]:
+    async def get_topic_ids(self, forum_id: int) -> set[int]:
         result = await self._session.execute(
             select(Topic.topic_id).where(Topic.forum_id == forum_id)
         )

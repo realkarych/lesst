@@ -12,10 +12,10 @@ class Email:
     from_name: str
     from_address: str
     to_: str
-    date: datetime
+    date: datetime | None = None
     subject: str | None = None
     text: list[str] | None = None
-    attachments_paths: tuple[PurePath] | None = None
+    attachments_paths: tuple[str] | None = None
 
 
 class EmailConnectionType(str, Enum):

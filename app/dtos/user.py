@@ -21,11 +21,11 @@ class UserDTO(DTO):
     @classmethod
     def from_message(cls, message: Message) -> UserDTO:
         return cls(
-            id=message.from_user.id,
-            username=message.from_user.username,
-            firstname=message.from_user.first_name,
-            lastname=message.from_user.last_name,
-            language_code=message.from_user.language_code
+            id=message.from_user.id,  # type: ignore
+            username=message.from_user.username,  # type: ignore
+            firstname=message.from_user.first_name,  # type: ignore
+            lastname=message.from_user.last_name,  # type: ignore
+            language_code=message.from_user.language_code  # type: ignore
         )
 
     def to_db_model(self) -> User:

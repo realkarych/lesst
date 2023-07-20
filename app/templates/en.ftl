@@ -52,6 +52,7 @@ auth-emails_count_limit_exceeded = You can't add new Email, because in your tari
 
                                    — To add new, you should delete one of the added yet. Press "My Emails" button
                                    — If you want increase limits, press "Subscription" button
+auth-no_added_emails = You don't have any connected Email boxes
 forum-general_topic_name = Service messages
 forum-email_not_added = Before adding a bot to a group, you need to connect your email to the bot. Go to the @mail_inbot PM and click /start
 forum-group_added = ✔️ The group has been added successfully. Emails will be uploaded to the sidebar within a few minutes. The more emails you have, the longer the process will take.

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import logging
 import quopri
@@ -20,7 +22,7 @@ def form_mail_text_nodes(text: str) -> list[str]:
     return text_builder
 
 
-def get_email_text(msg) -> str:
+def get_email_text(msg) -> str | None:
     if msg.is_multipart():
         for part in msg.walk():
             count = 0
@@ -31,9 +33,10 @@ def get_email_text(msg) -> str:
                 else:
                     letter_text = extract_part.rstrip().lstrip()
                 count += 1
-                return (
-                    letter_text.replace("<", "").replace(">", "").replace("\xa0", " ")
-                )
+                if letter_text:
+                    return letter_text.replace("<", "").replace(">", "").replace("\xa0", " ")
+                return
+
     else:
         count = 0
         if msg.get_content_maintype() == "text" and count == 0:
@@ -43,10 +46,12 @@ def get_email_text(msg) -> str:
             else:
                 letter_text = extract_part
             count += 1
-            return letter_text.replace("<", "").replace(">", "").replace("\xa0", " ")
+            if letter_text:
+                return letter_text.replace("<", "").replace(">", "").replace("\xa0", " ")
+            return
 
 
-def _get_email_text_from_html(body):
+def _get_email_text_from_html(body) -> str | None:
     body = body.replace("<div><div>", "<div>").replace("</div></div>", "</div>")
     try:
         soup = BeautifulSoup(body, "html.parser")
@@ -57,7 +62,7 @@ def _get_email_text_from_html(body):
         return text.replace("\xa0", " ")
     except Exception as exp:
         logging.error(exp)
-        return False
+        return
 
 
 def _get_letter_type(part):
