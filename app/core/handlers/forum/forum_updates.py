@@ -42,7 +42,8 @@ async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession
 async def handle_bot_removed_from_forum(event: ChatMemberUpdated, session: AsyncSession, bot: Bot,
                                         i18n: TranslatorRunner) -> None:
     email_dao = EmailDAO(session=session)
-    user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
+    user_email = await email_dao.get_email(user_id=event.from_user.id, forum_id=event.chat.id)
+    print(user_email)
     await email_dao.unset_forum(user_id=user_email.user_id, email_address=user_email.mail_address)
     with suppress(TelegramBadRequest):
         await bot.send_message(chat_id=user_email.user_id, text=i18n.forum.bot_removed())
@@ -57,8 +58,8 @@ async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: Trans
 
 
 async def _get_user_email(event: ChatMemberUpdated, bot: Bot, email_dao: EmailDAO, forum_id: int) -> EmailDTO | None:
-    chat_admins = await bot.get_chat_administrators(chat_id=event.chat.id)
     chat_owner_id = None
+    chat_admins = await bot.get_chat_administrators(chat_id=event.chat.id)
     for admin in chat_admins:
         if isinstance(admin, ChatMemberOwner) and not admin.user.is_bot:
             chat_owner_id = admin.user.id

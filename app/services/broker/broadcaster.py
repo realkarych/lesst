@@ -102,16 +102,19 @@ async def fetch_incoming_emails(
             )
 
             for email_id in not_sent_email_ids:
-                email_message = IncomingEmailMessageDTO(
-                    forum_id=int(str(user_email.forum_id)),
-                    mailbox_email_id=email_id,
-                    email_db_id=user_email.email_db_id,
-                    user_id=user_email.user_id
-                )
-                await jetstream.publish(
-                    subject=consts.EMAILS_SUBJECT,
-                    payload=ormsgpack.packb(email_message)
-                )
+                try:
+                    email_message = IncomingEmailMessageDTO(
+                        forum_id=int(str(user_email.forum_id)),
+                        mailbox_email_id=email_id,
+                        email_db_id=user_email.email_db_id,
+                        user_id=user_email.user_id
+                    )
+                    await jetstream.publish(
+                        subject=consts.EMAILS_SUBJECT,
+                        payload=ormsgpack.packb(email_message)
+                    )
+                except Exception as e:
+                    logging.error(e)
 
 
 async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:

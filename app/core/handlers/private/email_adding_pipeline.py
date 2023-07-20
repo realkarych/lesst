@@ -118,9 +118,9 @@ async def back_to_email(c: types.CallbackQuery, bot: Bot, state: FSMContext, i18
         chat_id=c.from_user.id,
         bot=bot,
         ids=(
-            int(str(data.get(cb_ids.MESSAGE_GENERATE_KEY_ID))),
-            int(str(data.get(cb_ids.PHOTO_TO_REMOVE_ID))),
-            int(str(data.get(cb_ids.EMAIL_PIPELINE_MESSAGE)))
+            data.get(cb_ids.MESSAGE_GENERATE_KEY_ID),
+            data.get(cb_ids.PHOTO_TO_REMOVE_ID),
+            data.get(cb_ids.EMAIL_PIPELINE_MESSAGE)
         )
     )
 

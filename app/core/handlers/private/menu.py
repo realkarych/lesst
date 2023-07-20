@@ -51,10 +51,11 @@ async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner, state:
     data = await state.get_data()
     await m.delete()
     with suppress(TelegramBadRequest):
-        await bot.delete_message(
-            chat_id=m.from_user.id,  # type: ignore
-            message_id=int(str(data.get(MESSAGE_TO_REMOVE_ID)))
-        )
+        if data.get(MESSAGE_TO_REMOVE_ID):
+            await bot.delete_message(
+                chat_id=m.from_user.id,  # type: ignore
+                message_id=data.get(MESSAGE_TO_REMOVE_ID)
+            )
     await send_response(m, bot, text=i18n.auth.choose_email_service(), markup=inline.email_services())
     await state.set_state(EmailAuth.service)
 

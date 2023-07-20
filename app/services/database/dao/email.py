@@ -42,7 +42,7 @@ class EmailDAO(BaseDAO[Email]):
     async def get_emails_with_forums(self) -> list[EmailDTO] | None:
         try:
             result = await self._session.execute(
-                select(Email).where(Email.forum_id.is_(None))
+                select(Email).where(Email.forum_id.isnot(None))
             )
             return [converters.db_email_to_dto(email) for email in result.scalars()]
         except NoResultFound:
@@ -67,7 +67,7 @@ class EmailDAO(BaseDAO[Email]):
     async def get_email_without_forum(self, user_id: int) -> EmailDTO | None:
         try:
             result = await self._session.execute(
-                select(Email).where(Email.user_id == user_id, Email.forum_id.isnot(None))
+                select(Email).where(Email.user_id == user_id, Email.forum_id.is_(None))
             )
             return converters.db_email_to_dto(result.scalar_one())
         except NoResultFound:
