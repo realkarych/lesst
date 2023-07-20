@@ -71,4 +71,3 @@ def _get_letter_type(part):
         return quopri.decodestring(part.get_payload()).decode(encoding)
     else:  # all possible types: quoted-printable, base64, 7bit, 8bit, and binary
         return part.get_payload()
-

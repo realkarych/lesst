@@ -5,14 +5,14 @@ from dataclasses import dataclass
 from app.settings import paths
 
 
-@dataclass
+@dataclass(frozen=True)
 class Bot:
     """Bot config"""
     token: str
     parse_mode: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class DB:
     """Database config"""
     host: str
@@ -26,7 +26,7 @@ class DB:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}/{self.name}"
 
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     """Configurator"""
     bot: Bot
