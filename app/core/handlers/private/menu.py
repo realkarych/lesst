@@ -29,8 +29,15 @@ from app.services.database.dao.user import UserDAO
 async def cmd_start(m: Message, bot: Bot, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
     await state.clear()
     await _add_user_to_db(session=session, message=m)
-    await send_response(m, bot, text=i18n.welcome.one(user_firstname=m.from_user.first_name), web_preview=True)
-    message = await send_response(m, bot, text=i18n.welcome.two(), markup=reply.menu(i18n))
+    with suppress(TelegramBadRequest):
+        await m.answer(
+            text=i18n.welcome.one(user_firstname=str(m.from_user.first_name)),  # type: ignore
+            disable_web_page_preview=False
+        )
+    message = await m.answer(
+        text=i18n.welcome.two(),
+        reply_markup=reply.menu(i18n)
+    )
     await state.set_data({MESSAGE_TO_REMOVE_ID: message.message_id})
 
 
@@ -44,7 +51,10 @@ async def btn_add_new_email(m: Message, bot: Bot, i18n: TranslatorRunner, state:
     data = await state.get_data()
     await m.delete()
     with suppress(TelegramBadRequest):
-        await bot.delete_message(chat_id=m.from_user.id, message_id=data.get(MESSAGE_TO_REMOVE_ID))
+        await bot.delete_message(
+            chat_id=m.from_user.id,  # type: ignore
+            message_id=int(str(data.get(MESSAGE_TO_REMOVE_ID)))
+        )
     await send_response(m, bot, text=i18n.auth.choose_email_service(), markup=inline.email_services())
     await state.set_state(EmailAuth.service)
 

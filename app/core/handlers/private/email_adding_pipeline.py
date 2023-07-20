@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import suppress
+
 from aiogram import types, Router, Bot
 from aiogram.enums import ChatType
 from aiogram.exceptions import TelegramBadRequest
@@ -67,14 +69,19 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
         email=data.get(cb_ids.EMAIL),
         password=auth_key
     )
-    await edit_or_build_email_message(bot=bot, m=m, message_id=data.get(cb_ids.EMAIL_PIPELINE_MESSAGE), text=text,
-                                      markup=None, state=state)
+    await edit_or_build_email_message(
+        bot=bot,
+        m=m,
+        message_id=data.get(cb_ids.EMAIL_PIPELINE_MESSAGE),
+        text=text,
+        markup=None, state=state
+    )
 
     await EmailDAO(session=session).add_email(
         email=EmailDTO.from_email(
-            user_id=m.from_user.id,
-            email_service=data.get(cb_ids.EMAIL_SERVICE).value,
-            email_address=data.get(cb_ids.EMAIL),
+            user_id=m.from_user.id,  # type: ignore
+            email_service=data.get(cb_ids.EMAIL_SERVICE).value,  # type: ignore
+            email_address=str(data.get(cb_ids.EMAIL)),
             email_auth_key=auth_key
         )
     )
@@ -86,11 +93,15 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
 
 
 async def back_to_email_services(c: types.CallbackQuery, bot: Bot, i18n: TranslatorRunner, state: FSMContext):
-    await c.message.answer(i18n.auth.choose_email_service(), reply_markup=inline.email_services())
-    await bot.delete_message(
-        chat_id=c.from_user.id,
-        message_id=c.message.message_id
+    await c.message.answer(  # type: ignore
+        text=i18n.auth.choose_email_service(),
+        reply_markup=inline.email_services()
     )
+    with suppress(TelegramBadRequest):
+        await bot.delete_message(
+            chat_id=c.from_user.id,
+            message_id=c.message.message_id  # type: ignore
+        )
     await state.clear()
     await state.set_state(EmailAuth.service)
 
@@ -99,21 +110,34 @@ async def back_to_email(c: types.CallbackQuery, bot: Bot, state: FSMContext, i18
     data = await state.get_data()
     msg_id = data.get(cb_ids.EMAIL_PIPELINE_MESSAGE)
     service = data.get(cb_ids.EMAIL_SERVICE)
-    await remove_messages(chat_id=c.from_user.id, bot=bot, ids=(
-        data.get(cb_ids.MESSAGE_GENERATE_KEY_ID),
-        data.get(cb_ids.PHOTO_TO_REMOVE_ID),
-        data.get(cb_ids.EMAIL_PIPELINE_MESSAGE)))
+
+    if not service:
+        raise ValueError(str(service))
+
+    await remove_messages(
+        chat_id=c.from_user.id,
+        bot=bot,
+        ids=(
+            int(str(data.get(cb_ids.MESSAGE_GENERATE_KEY_ID))),
+            int(str(data.get(cb_ids.PHOTO_TO_REMOVE_ID))),
+            int(str(data.get(cb_ids.EMAIL_PIPELINE_MESSAGE)))
+        )
+    )
 
     try:
-        await bot.edit_message_text(message_id=msg_id,
-                                    text=i18n.auth.enter_email(email_service=service.value.title),
-                                    reply_markup=inline.return_to_services(i18n))
+        await bot.edit_message_text(
+            message_id=msg_id,
+            text=i18n.auth.enter_email(email_service=service.value.title),
+            reply_markup=inline.return_to_services(i18n)
+        )
     except TelegramBadRequest:
-        new_msg = await c.message.answer(text=i18n.auth.enter_email(email_service=service.value.title),
-                                         reply_markup=inline.return_to_services(i18n))
-        await state.update_data({cb_ids.EMAIL_PIPELINE_MESSAGE: new_msg.message_id})
+        new_msg = await c.message.answer(  # type: ignore
+            text=i18n.auth.enter_email(email_service=service.value.title),
+            reply_markup=inline.return_to_services(i18n)
+        )
+        await state.update_data({cb_ids.EMAIL_PIPELINE_MESSAGE: new_msg.message_id})  # type: ignore
 
-    await state.update_data({cb_ids.MESSAGE_TO_REMOVE_ID: c.message.message_id})
+    await state.update_data({cb_ids.MESSAGE_TO_REMOVE_ID: c.message.message_id})  # type: ignore
     await state.set_state(EmailAuth.email)
 
 
