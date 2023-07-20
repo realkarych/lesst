@@ -60,7 +60,7 @@ class EmailDAO(BaseDAO[Email]):
 
     @exception_mapper
     async def get_user_emails_count(self, user_id: int) -> int:
-        result = await self._session.execute(select(func.count(Email)).where(Email.user_id == user_id))
+        result = await self._session.execute(select(func.count(Email.id)).where(Email.user_id == user_id))
         return result.scalar_one()
 
     @exception_mapper
