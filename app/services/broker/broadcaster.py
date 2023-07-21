@@ -130,6 +130,8 @@ async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_
     except TelegramRetryAfter as e:
         await asyncio.sleep(float(e.retry_after))
         await _broadcast_email(bot, session, email, forum_id)
+    except Exception as e:
+        logging.error(e)
 
 
 async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Email):
