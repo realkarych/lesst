@@ -35,7 +35,7 @@ def return_to_email(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
 def add_to_chat(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=i18n.button.add_to_chat(), url="tg://resolve?domain=lesstrobot&startgroup")]
+            [InlineKeyboardButton(text=i18n.button.add_to_chat(), url="https://t.me/lesstrobot?startgroup=true")]
         ]
     )
 
