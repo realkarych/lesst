@@ -42,15 +42,19 @@ def get_imap_params_message(i18n: TranslatorRunner, email_service: EmailServices
 
 
 def first_email_message(email: Email) -> str:
-    return f"{email.from_name}: {email.subject}\n\n{email.text[0]}"
+    return f"<b>{email.from_name}: {email.subject}</b>\n\n{email.text[0]}"
 
 
 def last_email_message(email: Email) -> str:
-    return f"{email.text[-1]}\n\n{email.date}"
+    return f"{email.text[-1]}\n\n<i>{email.date}</i>"
+
+
+def single_email_message(email: Email) -> str:
+    return f"<b>{email.from_name}: {email.subject}</b>\n\n{email.text[0]}\n\n<i>{email.date}</i>"
 
 
 def email_message_without_text(email: Email) -> str:
-    return f"{email.from_name}: {email.subject}\n\n{email.date}"
+    return f"<b>{email.from_name}: {email.subject}</b>\n\n<i>{email.date}</i>"
 
 
 def get_email_info(email: EmailDTO) -> str:
