@@ -107,13 +107,13 @@ def register() -> Router:
     router.message.register(
         btn_add_new_email,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        F.text(text=reply_callbacks.CONNECT_NEW_EMAIL)
+        F.text.in_(reply_callbacks.CONNECT_NEW_EMAIL)
     )
 
     router.message.register(
         btn_my_emails,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        F.text(text=reply_callbacks.MY_EMAILS)
+        F.text.in_(reply_callbacks.MY_EMAILS)
     )
 
     router.callback_query.register(

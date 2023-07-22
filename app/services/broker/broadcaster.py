@@ -6,7 +6,7 @@ from contextlib import suppress
 
 import dataclass_factory
 from aiogram import Bot
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
+from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter, TelegramForbiddenError
 from nats.errors import ConnectionClosedError
 from nats.js import JetStreamContext
 from ormsgpack import ormsgpack  # type: ignore
@@ -73,6 +73,9 @@ async def broadcast_incoming_emails(
                             if email:
                                 await _broadcast_email(bot=bot, session=session, email=email,
                                                        forum_id=email_message.forum_id)
+
+                        except (TelegramBadRequest, TelegramForbiddenError):
+                            pass
                         except Exception as error:
                             logging.error(error)
 
