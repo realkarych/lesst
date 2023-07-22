@@ -13,8 +13,8 @@ from app.core.messages import remove_messages, enter_password_message
 from app.core.responses import edit_or_build_email_message
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, EMAIL, PHOTO_TO_REMOVE_ID, \
     MESSAGE_GENERATE_KEY_ID, MESSAGE_TO_REMOVE_ID
-from app.services.email.imap.attachments import IncomingAttachmentsDirectory
 from app.services.email.base.entities import EmailService, EmailServers
+from app.services.email.imap.attachments import IncomingAttachmentsDirectory
 from app.services.email.imap.fetcher.base import Mailbox
 from app.settings.paths import get_imap_image_path
 

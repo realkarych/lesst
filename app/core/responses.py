@@ -57,7 +57,8 @@ async def send_topic_email(bot: Bot, email: IncomingEmail, topic: TopicDTO, disa
                                   sent_text_message_to_reply=first_sent_message)
 
 
-async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: TopicDTO, disable_notification: bool) -> Message:
+async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: TopicDTO,
+                                    disable_notification: bool) -> Message:
     """returns first sent message"""
     first_sent_message = None
     if email.text:
@@ -85,7 +86,8 @@ async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: Topic
     return first_sent_message
 
 
-async def _send_email_attachments(bot: Bot, email: IncomingEmail, topic: TopicDTO, sent_text_message_to_reply: Message) -> None:
+async def _send_email_attachments(bot: Bot, email: IncomingEmail, topic: TopicDTO,
+                                  sent_text_message_to_reply: Message) -> None:
     if email.attachments_paths:
         for attachment_path in email.attachments_paths:
             with suppress(TelegramBadRequest, TelegramNetworkError, FileNotFoundError):

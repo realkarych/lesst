@@ -19,8 +19,8 @@ from app.dtos.topic import TopicDTO
 from app.services.broker import consts
 from app.services.database.dao.email import EmailDAO
 from app.services.database.dao.topic import TopicDAO
-from app.services.email.imap.attachments import IncomingAttachmentsDirectory
 from app.services.email.base.entities import get_service_by_id, IncomingEmail
+from app.services.email.imap.attachments import IncomingAttachmentsDirectory
 from app.services.email.imap.fetcher.mailbox import BroadcastMailbox
 from app.settings import settings
 

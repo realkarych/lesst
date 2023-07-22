@@ -7,9 +7,9 @@ from contextlib import suppress
 from aioimaplib import aioimaplib
 from mailparser import mailparser
 
+from app.services.email.base.entities import EmailService, EmailConnectionType, IncomingEmail
 from app.services.email.imap import parser
 from app.services.email.imap.attachments import IncomingAttachmentsDirectory
-from app.services.email.base.entities import EmailService, EmailConnectionType, IncomingEmail
 from app.services.email.imap.parser import get_email_text
 from app.settings.settings import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
 

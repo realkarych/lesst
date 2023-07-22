@@ -5,9 +5,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from os.path import basename
 
+import aiosmtplib
+
 from app.dtos.email import UserEmailDTO
 from app.services.email.base.entities import EmailServers, OutgoingEmail
-import aiosmtplib
 
 
 class SMTPClient:
