@@ -5,8 +5,8 @@ from contextlib import suppress
 
 from aioimaplib import aioimaplib
 
-from app.services.email.entities import EmailFlagPattern
-from app.services.email.fetcher.base import Mailbox
+from app.services.email.base.entities import EmailFlagPattern
+from app.services.email.imap.fetcher.base import Mailbox
 from app.settings import settings
 
 

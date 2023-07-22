@@ -13,15 +13,15 @@ from ormsgpack import ormsgpack  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.responses import send_topic_email
-from app.dtos.email import EmailDTO
+from app.dtos.email import UserEmailDTO
 from app.dtos.incoming_email import IncomingEmailMessageDTO
 from app.dtos.topic import TopicDTO
 from app.services.broker import consts
 from app.services.database.dao.email import EmailDAO
 from app.services.database.dao.topic import TopicDAO
-from app.services.email.cache import EmailCacheDirectory
-from app.services.email.entities import get_service_by_id, Email
-from app.services.email.fetcher.broadcast import BroadcastMailbox
+from app.services.email.imap.attachments import IncomingAttachmentsDirectory
+from app.services.email.base.entities import get_service_by_id, IncomingEmail
+from app.services.email.imap.fetcher.mailbox import BroadcastMailbox
 from app.settings import settings
 
 
@@ -48,6 +48,7 @@ async def broadcast_incoming_emails(
         for pulled_email_message in pulled_email_messages:
             email_message = factory.load(ormsgpack.unpackb(pulled_email_message.data), IncomingEmailMessageDTO)
             user_mailbox = await email_dao.get_email(user_id=email_message.user_id, forum_id=email_message.forum_id)
+
             if not user_mailbox:
                 await pulled_email_message.ack()
                 continue
@@ -58,7 +59,7 @@ async def broadcast_incoming_emails(
                 last_email_id=email_message.mailbox_email_id
             )
 
-            with EmailCacheDirectory(user_id=user_mailbox.user_id) as cache_dir:
+            with IncomingAttachmentsDirectory(user_id=user_mailbox.user_id) as cache_dir:
                 async with BroadcastMailbox(
                         cache_dir=cache_dir,
                         email_address=user_mailbox.mail_address,
@@ -89,7 +90,7 @@ async def fetch_incoming_emails(
             return
 
         for user_email in emails_with_forums:
-            user_email: EmailDTO
+            user_email: UserEmailDTO
 
             not_sent_email_ids = await _get_not_sent_email_ids(user_email=user_email)
             if not not_sent_email_ids:
@@ -117,7 +118,7 @@ async def fetch_incoming_emails(
                     logging.error(e)
 
 
-async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_id: int) -> None:
+async def _broadcast_email(bot: Bot, session: AsyncSession, email: IncomingEmail, forum_id: int) -> None:
     topic_dao = TopicDAO(session)
     is_topic_created = await topic_dao.is_topic_created(forum_id=forum_id, email_address=email.from_address)
     if not is_topic_created:
@@ -134,7 +135,7 @@ async def _broadcast_email(bot: Bot, session: AsyncSession, email: Email, forum_
         logging.error(e)
 
 
-async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Email):
+async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: IncomingEmail):
     with suppress(TelegramBadRequest):
         new_topic = await bot.create_forum_topic(chat_id=forum_id, name=email.from_address)
         await topic_dao.add_topic(
@@ -146,8 +147,8 @@ async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Ema
         )
 
 
-async def _get_not_sent_email_ids(user_email: EmailDTO) -> list[int] | None:
-    with EmailCacheDirectory(user_id=user_email.user_id) as cache_dir:
+async def _get_not_sent_email_ids(user_email: UserEmailDTO) -> list[int] | None:
+    with IncomingAttachmentsDirectory(user_id=user_email.user_id) as cache_dir:
         async with BroadcastMailbox(
                 cache_dir=cache_dir,
                 email_address=user_email.mail_address,

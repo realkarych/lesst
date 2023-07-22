@@ -7,17 +7,17 @@ from contextlib import suppress
 from aioimaplib import aioimaplib
 from mailparser import mailparser
 
-from app.services.email import parser
-from app.services.email.cache import EmailCacheDirectory
-from app.services.email.entities import EmailService, EmailConnectionType, Email
-from app.services.email.parser import get_email_text
+from app.services.email.imap import parser
+from app.services.email.imap.attachments import IncomingAttachmentsDirectory
+from app.services.email.base.entities import EmailService, EmailConnectionType, IncomingEmail
+from app.services.email.imap.parser import get_email_text
 from app.settings.settings import EMAIL_CONNECTIONS_ATTEMPTS_COUNT
 
 
 class Mailbox:
 
     def __init__(self, email_service: EmailService, email_address: str, email_auth_key: str,
-                 user_id: int, cache_dir: EmailCacheDirectory) -> None:
+                 user_id: int, cache_dir: IncomingAttachmentsDirectory) -> None:
         self._email_service = email_service
         self._email_address = email_address
         self._email_auth_key = email_auth_key
@@ -56,7 +56,7 @@ class Mailbox:
         except IndexError:
             return None
 
-    async def get_email(self, email_id: str) -> Email | None:
+    async def get_email(self, email_id: str) -> IncomingEmail | None:
         response = await self._get_response(email_id)
         if not response:
             return None
@@ -79,7 +79,7 @@ class Mailbox:
 
         attachments_paths = self._cache_dir.save_attachments(email=letter, email_id=int(email_id))
 
-        return Email(
+        return IncomingEmail(
             id_=str(email_id),
             from_name=str(letter.from_[0][0]),
             from_address=str(letter.from_[0][1]),

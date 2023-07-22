@@ -3,13 +3,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from fluentogram import TranslatorRunner
 
 from app.core.states.callbacks import EmailServiceCallbackFactory, UserEmailCallbackFactory
-from app.dtos.email import EmailDTO
-from app.services.email.entities import EmailServices
+from app.dtos.email import UserEmailDTO
+from app.services.email.base.entities import EmailServers
 
 
 def email_services() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    for service in EmailServices:
+    for service in EmailServers:
         builder.button(
             text=service.value.title,
             callback_data=EmailServiceCallbackFactory(
@@ -40,7 +40,7 @@ def add_to_chat(i18n: TranslatorRunner) -> InlineKeyboardMarkup:
     )
 
 
-def remove_email(i18n: TranslatorRunner, email: EmailDTO) -> InlineKeyboardMarkup:
+def remove_email(i18n: TranslatorRunner, email: UserEmailDTO) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(
         text=str(i18n.button.remove_email()),

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.forum import is_forum
 from app.core.keyboards import reply
-from app.dtos.email import EmailDTO
+from app.dtos.email import UserEmailDTO
 from app.services.database.dao.email import EmailDAO
 from app.settings import paths
 
@@ -65,7 +65,7 @@ async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: Trans
         await bot.edit_general_forum_topic(chat_id=event.chat.id, name=i18n.forum.general_topic_name())
 
 
-async def _get_user_email(event: ChatMemberUpdated, bot: Bot, email_dao: EmailDAO, forum_id: int) -> EmailDTO | None:
+async def _get_user_email(event: ChatMemberUpdated, bot: Bot, email_dao: EmailDAO, forum_id: int) -> UserEmailDTO | None:
     chat_owner_id = None
     chat_admins = await bot.get_chat_administrators(chat_id=event.chat.id)
     for admin in chat_admins:
