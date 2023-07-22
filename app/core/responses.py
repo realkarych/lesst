@@ -12,7 +12,7 @@ from aiogram.types import FSInputFile, Message, InlineKeyboardMarkup, ReplyKeybo
 from app.core import messages
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE
 from app.dtos.topic import TopicDTO
-from app.services.email.entities import Email
+from app.services.email.base.entities import IncomingEmail
 
 
 async def edit_or_build_email_message(
@@ -50,14 +50,15 @@ async def edit_or_build_email_message(
         await state.update_data({EMAIL_PIPELINE_MESSAGE: new_message.message_id})
 
 
-async def send_topic_email(bot: Bot, email: Email, topic: TopicDTO, disable_notification: bool = False) -> None:
+async def send_topic_email(bot: Bot, email: IncomingEmail, topic: TopicDTO, disable_notification: bool = False) -> None:
     first_sent_message = await _send_text_email_messages(bot=bot, email=email, topic=topic,
                                                          disable_notification=disable_notification)
     await _send_email_attachments(bot=bot, email=email, topic=topic,
                                   sent_text_message_to_reply=first_sent_message)
 
 
-async def _send_text_email_messages(bot: Bot, email: Email, topic: TopicDTO, disable_notification: bool) -> Message:
+async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: TopicDTO,
+                                    disable_notification: bool) -> Message:
     """returns first sent message"""
     first_sent_message = None
     if email.text:
@@ -85,7 +86,8 @@ async def _send_text_email_messages(bot: Bot, email: Email, topic: TopicDTO, dis
     return first_sent_message
 
 
-async def _send_email_attachments(bot: Bot, email: Email, topic: TopicDTO, sent_text_message_to_reply: Message) -> None:
+async def _send_email_attachments(bot: Bot, email: IncomingEmail, topic: TopicDTO,
+                                  sent_text_message_to_reply: Message) -> None:
     if email.attachments_paths:
         for attachment_path in email.attachments_paths:
             with suppress(TelegramBadRequest, TelegramNetworkError, FileNotFoundError):
@@ -95,7 +97,7 @@ async def _send_email_attachments(bot: Bot, email: Email, topic: TopicDTO, sent_
                                         document=FSInputFile(str(attachment_path)))
 
 
-def _get_email_texts(email: Email) -> list[str]:
+def _get_email_texts(email: IncomingEmail) -> list[str]:
     first_text_part_index = 0
     last_text_part_index = len(email.text) - 1 if len(email.text) > 0 else 0
     texts = []

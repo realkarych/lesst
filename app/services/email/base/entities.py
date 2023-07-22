@@ -6,7 +6,7 @@ from enum import Enum
 
 
 @dataclass(frozen=True)
-class Email:
+class IncomingEmail:
     id_: str
     from_name: str
     from_address: str
@@ -14,6 +14,14 @@ class Email:
     date: datetime | None = None
     subject: str | None = None
     text: list[str] | None = None
+    attachments_paths: tuple[str] | None = None
+
+
+@dataclass(frozen=True)
+class OutgoingEmail:
+    send_to: list[str]
+    subject: str | None = None
+    text: str | None = None
     attachments_paths: tuple[str] | None = None
 
 
@@ -61,7 +69,7 @@ class EmailService:
     smtp: SMTP
 
 
-class EmailServices(Enum):
+class EmailServers(Enum):
     gmail = EmailService(
         id_="gmail",
         title="Gmail",
@@ -82,8 +90,8 @@ class EmailServices(Enum):
     )
 
 
-def get_service_by_id(service_id: str) -> EmailServices:
-    for service in EmailServices:
+def get_service_by_id(service_id: str) -> EmailServers:
+    for service in EmailServers:
         if service.value.id_ == service_id:
             return service
     raise ValueError(f"Wrong service id submitted! {service_id}")

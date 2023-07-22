@@ -34,7 +34,7 @@ async def main() -> None:
 
     bot = Bot(config.bot.token, parse_mode=config.bot.parse_mode)
     await set_bot_commands(bot=bot)
-    dp = Dispatcher(bot=bot, storage=MemoryStorage())
+    dp = Dispatcher(storage=MemoryStorage())
 
     db_session_pool = await setup_get_pool(db_uri=config.db.get_uri())
     nats_connection = await nats.connect(["nats://localhost:4222"])

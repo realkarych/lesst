@@ -11,7 +11,7 @@ from app.core.messages import remove_messages
 from app.core.responses import edit_or_build_email_message
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, MESSAGE_TO_REMOVE_ID
 from app.services.database.dao.email import EmailDAO
-from app.services.email import validator
+from app.services.email.imap import validator
 
 
 def valid_email(handler: callable) -> Callable[[Message], Coroutine]:

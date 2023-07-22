@@ -19,9 +19,9 @@ from app.core.responses import edit_or_build_email_message
 from app.core.states import callbackdata_ids as cb_ids
 from app.core.states.callbacks import EmailServiceCallbackFactory
 from app.core.states.mail_authorization import EmailAuth
-from app.dtos.email import EmailDTO
+from app.dtos.email import UserEmailDTO
 from app.services.database.dao.email import EmailDAO
-from app.services.email.entities import get_service_by_id
+from app.services.email.base.entities import get_service_by_id
 from app.settings import paths
 from app.settings.paths import get_imap_image_path
 
@@ -78,7 +78,7 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
     )
 
     await EmailDAO(session=session).add_email(
-        email=EmailDTO.from_email(
+        email=UserEmailDTO.from_email(
             user_id=m.from_user.id,  # type: ignore
             email_service=data.get(cb_ids.EMAIL_SERVICE).value,  # type: ignore
             email_address=str(data.get(cb_ids.EMAIL)),

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.dtos.email import EmailDTO
+from app.dtos.email import UserEmailDTO
 from app.dtos.topic import TopicDTO
 from app.dtos.user import UserDTO
 from app.services import cryptography
@@ -18,8 +18,8 @@ def db_user_to_dto(user: User) -> UserDTO:
     )
 
 
-def db_email_to_dto(email: Email) -> EmailDTO:
-    return EmailDTO(
+def db_email_to_dto(email: Email) -> UserEmailDTO:
+    return UserEmailDTO(
         email_db_id=int(str(email.id)),
         user_id=int(str(email.user_id)),
         forum_id=int(str(email.forum_id)) if bool(email.forum_id) else None,

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from contextlib import suppress
 
-from aiogram import types, Router, Bot
+from aiogram import types, Router, Bot, F
 from aiogram.enums import ChatType
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import Command, Text
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from fluentogram import TranslatorRunner
@@ -107,13 +107,13 @@ def register() -> Router:
     router.message.register(
         btn_add_new_email,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Text(text=reply_callbacks.CONNECT_NEW_EMAIL)
+        F.text.in_(reply_callbacks.CONNECT_NEW_EMAIL)
     )
 
     router.message.register(
         btn_my_emails,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Text(text=reply_callbacks.MY_EMAILS)
+        F.text.in_(reply_callbacks.MY_EMAILS)
     )
 
     router.callback_query.register(
