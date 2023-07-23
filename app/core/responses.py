@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import suppress
 
 from aiogram import Bot
 from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
+from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError, TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
@@ -75,6 +76,10 @@ async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: Topic
             try:
                 msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
                                              text=text, disable_notification=disable_notification)
+            except TelegramRetryAfter as e:
+                await asyncio.sleep(float(e.retry_after))
+                msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                             text=text, disable_notification=disable_notification)
             except Exception as e:
                 msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
                                              text=text, disable_notification=disable_notification,
@@ -99,12 +104,21 @@ async def _send_email_attachments(bot: Bot, email: IncomingEmail, topic: TopicDT
     if email.attachments_paths:
         for attachment_path in email.attachments_paths:
             with suppress(TelegramBadRequest, TelegramNetworkError, FileNotFoundError):
-                await bot.send_document(
-                    chat_id=topic.forum_id,
-                    message_thread_id=topic.topic_id,
-                    reply_to_message_id=sent_text_message_to_reply.message_id,
-                    document=FSInputFile(str(attachment_path))
-                )
+                try:
+                    await bot.send_document(
+                        chat_id=topic.forum_id,
+                        message_thread_id=topic.topic_id,
+                        reply_to_message_id=sent_text_message_to_reply.message_id,
+                        document=FSInputFile(str(attachment_path))
+                    )
+                except TelegramRetryAfter as e:
+                    await asyncio.sleep(float(e.retry_after))
+                    await bot.send_document(
+                        chat_id=topic.forum_id,
+                        message_thread_id=topic.topic_id,
+                        reply_to_message_id=sent_text_message_to_reply.message_id,
+                        document=FSInputFile(str(attachment_path))
+                    )
 
 
 def _get_email_texts(email: IncomingEmail) -> list[str] | list[None]:

@@ -103,12 +103,12 @@ async def _set_schedulers(
 ) -> None:
     scheduler.add_job(
         broadcast_incoming_emails,
-        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        IntervalTrigger(seconds=settings.BROADCASTING_SEC_INTERVAL),
         (bot, db_session_pool, jetstream_context)
     )
     scheduler.add_job(
         fetch_incoming_emails,
-        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        IntervalTrigger(seconds=settings.FETCHING_SEC_INTERVAL),
         (db_session_pool, jetstream_context)
     )
 

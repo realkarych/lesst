@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from contextlib import suppress
 
 import dataclass_factory
 from aiogram import Bot
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter, TelegramForbiddenError
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from nats.aio.msg import Msg
 from nats.errors import ConnectionClosedError
 from nats.js import JetStreamContext
@@ -91,9 +90,6 @@ async def _send_email(bot: Bot, session: AsyncSession, email: IncomingEmail, for
 
     try:
         await send_topic_email(bot=bot, email=email, topic=topic)
-    except TelegramRetryAfter as e:
-        await asyncio.sleep(float(e.retry_after))
-        await _send_email(bot, session, email, forum_id)
     except Exception as e:
         logging.error(e)
 
