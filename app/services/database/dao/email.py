@@ -74,7 +74,7 @@ class EmailDAO(BaseDAO[Email]):
             return None
 
     @exception_mapper
-    async def set_last_email_id(self, user_id: int, email_address: str, last_email_id: int) -> None:
+    async def set_last_sent_email_id(self, user_id: int, email_address: str, last_email_id: int) -> None:
         await self._session.execute(
             update(Email).where(
                 Email.user_id == user_id,
@@ -85,7 +85,7 @@ class EmailDAO(BaseDAO[Email]):
         await self.commit()
 
     @exception_mapper
-    async def set_last_email_id_by_email_id(self, email_db_id: int, last_email_id: int) -> None:
+    async def set_last_sent_email_id_by_email_id(self, email_db_id: int, last_email_id: int) -> None:
         await self._session.execute(
             update(Email).where(
                 Email.id == email_db_id,
