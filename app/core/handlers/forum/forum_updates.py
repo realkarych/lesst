@@ -21,22 +21,21 @@ from app.settings import paths
 async def handle_adding_to_forum(event: ChatMemberUpdated, session: AsyncSession, bot: Bot,
                                  i18n: TranslatorRunner) -> None:
     email_dao = EmailDAO(session=session)
-    user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao, forum_id=event.chat.id)
+    user_email = await _get_user_email(event=event, bot=bot, email_dao=email_dao,
+                                       forum_id=event.chat.id)
 
     if not user_email:
         with suppress(TelegramBadRequest, TelegramForbiddenError):
             await bot.send_message(chat_id=event.chat.id, text=i18n.forum.email_not_added())
         return
 
-    await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
-                              email_address=user_email.mail_address)
-    user_email = await email_dao.get_email(user_id=user_email.user_id, forum_id=event.chat.id)
-
-    await _update_forum_settings(event, bot, i18n)
-
     try:
         await bot.send_message(chat_id=event.chat.id, text=i18n.forum.group_added())
-    except TelegramBadRequest:
+        await _update_forum_settings(event, bot, i18n)
+        await email_dao.set_forum(user_id=user_email.user_id, forum_id=event.chat.id,
+                                  email_address=user_email.mail_address)
+    except (TelegramBadRequest, TelegramForbiddenError):
+        # Try to notify user in PM, that the adding to forum happened incorrectly
         with suppress(TelegramBadRequest, TelegramForbiddenError):
             await bot.send_message(chat_id=user_email.user_id, text=i18n.forum.no_permissions())
 
@@ -63,7 +62,7 @@ async def _update_forum_settings(event: ChatMemberUpdated, bot: Bot, i18n: Trans
     with suppress(TelegramBadRequest, TelegramForbiddenError):
         await bot.edit_general_forum_topic(chat_id=event.chat.id, name=i18n.forum.general_topic_name())
         await bot.create_forum_topic(chat_id=event.chat.id, name=i18n.forum.topic_send_email(),
-                                     icon_custom_emoji_id="5309984423003823246")
+                                     icon_custom_emoji_id="5309984423003823246")  # Emoji trumpet
 
 
 async def _get_user_email(event: ChatMemberUpdated, bot: Bot, email_dao: EmailDAO,
