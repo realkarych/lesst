@@ -39,14 +39,14 @@ class EmailDAO(BaseDAO[Email]):
             return None
 
     @exception_mapper
-    async def get_emails_with_forums(self) -> list[UserEmailDTO] | None:
+    async def get_emails_with_forums(self) -> list[UserEmailDTO] | list[None]:
         try:
             result = await self._session.execute(
                 select(Email).where(Email.forum_id.isnot(None))
             )
             return [converters.db_email_to_dto(email) for email in result.scalars()]
         except NoResultFound:
-            return None
+            return []
 
     @exception_mapper
     async def get_user_emails(self, user_id: int) -> tuple[UserEmailDTO] | None:

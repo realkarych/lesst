@@ -8,6 +8,7 @@ import dataclass_factory
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter, TelegramForbiddenError
 from nats.aio.msg import Msg
+from nats.errors import ConnectionClosedError
 from nats.js import JetStreamContext
 from ormsgpack import ormsgpack  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -32,7 +33,7 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker, 
                                                     durable=consts.DURABLE)
         try:
             pulled_email_messages = await subscriber.fetch(settings.BROADCAST_BATCH_SIZE)
-        except TimeoutError:
+        except (TimeoutError, ConnectionClosedError):
             return
 
         for pulled_email_message in pulled_email_messages:
@@ -52,15 +53,10 @@ async def broadcast_incoming_emails(bot: Bot, session_pool: async_sessionmaker, 
             await pulled_email_message.ack()
 
 
-async def fetch_incoming_emails(
-        session_pool: async_sessionmaker,
-        jetstream: JetStreamContext
-) -> None:
+async def fetch_incoming_emails(session_pool: async_sessionmaker, jetstream: JetStreamContext) -> None:
     async with session_pool() as session:
         email_dao = EmailDAO(session)
         emails_with_forums = await email_dao.get_emails_with_forums()
-        if not emails_with_forums:
-            return
 
         for user_email in emails_with_forums:
             user_email: UserEmailDTO
@@ -69,26 +65,27 @@ async def fetch_incoming_emails(
             if not not_sent_email_ids:
                 continue
 
-            # Update last "handled" email-id. "Handled" means: "added to nats queue"
-            await email_dao.set_last_sent_email_id_by_email_id(
-                email_db_id=int(str(user_email.email_db_id)),
-                last_email_id=max(not_sent_email_ids)
-            )
-
             for email_id in not_sent_email_ids:
                 try:
-                    email_message = IncomingEmailMessageDTO(
-                        forum_id=int(str(user_email.forum_id)),
-                        mailbox_email_id=email_id,
-                        email_db_id=user_email.email_db_id,
-                        user_id=user_email.user_id
-                    )
                     await jetstream.publish(
                         subject=consts.EMAILS_SUBJECT,
-                        payload=ormsgpack.packb(email_message)
+                        payload=ormsgpack.packb(
+                            IncomingEmailMessageDTO(
+                                forum_id=user_email.forum_id,
+                                mailbox_email_id=email_id,
+                                email_db_id=user_email.email_db_id,
+                                user_id=user_email.user_id
+                            )
+                        )
                     )
                 except Exception as e:
                     logging.error(e)
+
+            # Update last "handled" email-id. "Handled" means: "added to nats queue"
+            await email_dao.set_last_sent_email_id_by_email_id(
+                email_db_id=user_email.email_db_id,
+                last_email_id=max(not_sent_email_ids)
+            )
 
 
 def _unpack_email_message(pulled_email_message: Msg) -> IncomingEmailMessageDTO:
@@ -148,7 +145,7 @@ async def _create_topic(bot: Bot, topic_dao: TopicDAO, forum_id: int, email: Inc
         )
 
 
-async def _get_not_sent_email_ids(user_email: UserEmailDTO) -> list[int] | None:
+async def _get_not_sent_email_ids(user_email: UserEmailDTO) -> list[int] | list[None]:
     with IncomingAttachmentsDirectory(user_id=user_email.user_id) as cache_dir:
         async with BroadcastMailbox(
                 cache_dir=cache_dir,
@@ -159,6 +156,8 @@ async def _get_not_sent_email_ids(user_email: UserEmailDTO) -> list[int] | None:
         ) as mailbox:
             if mailbox.can_connect():
                 if user_email.last_email_id == 0:  # No sent emails yet. Realize initial Emails fetching
-                    return await mailbox.get_initial_emails_ids()
+                    emails_ids = await mailbox.get_initial_emails_ids()
                 else:  # There are already sent emails. Trying it out to fetch new Emails
-                    return await mailbox.get_not_sent_emails_ids(last_email_id=user_email.last_email_id)
+                    emails_ids = await mailbox.get_not_sent_emails_ids(last_email_id=user_email.last_email_id)
+                return emails_ids or []
+    return []
