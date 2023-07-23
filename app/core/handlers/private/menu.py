@@ -27,12 +27,13 @@ from app.services.database.dao.user import UserDAO
 
 async def cmd_start(m: Message, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
     await state.clear()
+
     await _add_user_to_db(session=session, message=m)
-    with suppress(TelegramBadRequest):
-        await m.answer(
-            text=i18n.welcome.one(user_firstname=str(m.from_user.first_name)),  # type: ignore
-            disable_web_page_preview=False
-        )
+
+    await m.answer(
+        text=i18n.welcome.one(user_firstname=str(m.from_user.first_name)),  # type: ignore
+        disable_web_page_preview=False
+    )
     message = await m.answer(
         text=i18n.welcome.two(),
         reply_markup=reply.menu(i18n)
