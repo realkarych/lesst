@@ -40,11 +40,9 @@ async def cbq_email_service(c: types.CallbackQuery, callback_data: EmailServiceC
 @new_email
 async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner, email: str):
     data = await state.get_data()
-    text = get_imap_params_message(
-        i18n=i18n,
-        email_service=data.get(cb_ids.EMAIL_SERVICE),
-        email=email
-    )
+
+    text = get_imap_params_message(i18n=i18n, email_service=data.get(cb_ids.EMAIL_SERVICE), email=email)
+
     await edit_or_build_email_message(
         bot=bot, m=m, text=text, markup=None, message_id=data.get(cb_ids.EMAIL_PIPELINE_MESSAGE), state=state
     )

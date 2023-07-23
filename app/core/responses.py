@@ -26,7 +26,7 @@ async def edit_or_build_email_message(
         parse_mode: ParseMode | None = ParseMode.HTML
 ) -> None:
     """
-    Method implements updates email message. If it has been removed by user, creates new and update message id in
+    Method implements updating email message. If it has been removed by user, creates new and update message id in
     MemoryStorage
     """
 
@@ -47,42 +47,50 @@ async def edit_or_build_email_message(
             reply_markup=markup,
             parse_mode=parse_mode
         )
-        await state.update_data({EMAIL_PIPELINE_MESSAGE: new_message.message_id})
+
+        await _update_email_message_id_memory_storage(state=state, message_id=new_message.message_id)
 
 
-async def send_topic_email(bot: Bot, email: IncomingEmail, topic: TopicDTO, disable_notification: bool = False) -> None:
-    first_sent_message = await _send_text_email_messages(bot=bot, email=email, topic=topic,
-                                                         disable_notification=disable_notification)
-    await _send_email_attachments(bot=bot, email=email, topic=topic,
-                                  sent_text_message_to_reply=first_sent_message)
+async def send_topic_email(bot: Bot, email: IncomingEmail, topic: TopicDTO,
+                           disable_notification: bool = False) -> None:
+    first_sent_message = await _send_text_email_messages(
+        bot=bot, email=email, topic=topic, disable_notification=disable_notification
+    )
+    await _send_email_attachments(
+        bot=bot, email=email, topic=topic, sent_text_message_to_reply=first_sent_message
+    )
+
+
+async def _update_email_message_id_memory_storage(state: FSMContext, message_id: int) -> None:
+    await state.update_data({EMAIL_PIPELINE_MESSAGE: message_id})
 
 
 async def _send_text_email_messages(bot: Bot, email: IncomingEmail, topic: TopicDTO,
                                     disable_notification: bool) -> Message:
     """returns first sent message"""
+
     first_sent_message = None
-    if email.text:
-        for text in _get_email_texts(email):
-            with suppress(TelegramBadRequest):
-                try:
-                    msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                                 text=text, disable_notification=disable_notification)
-                except Exception as e:
-                    msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
-                                                 text=text, disable_notification=disable_notification,
-                                                 parse_mode=None)
-                    logging.warning("Parse mode error: " + str(e) + "\n" + "In text: " + text)
+    for text in _get_email_texts(email):
+        with suppress(TelegramBadRequest):
+            try:
+                msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                             text=text, disable_notification=disable_notification)
+            except Exception as e:
+                msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
+                                             text=text, disable_notification=disable_notification,
+                                             parse_mode=None)
+                logging.warning("Parse mode error: " + str(e) + "\n" + "In text: " + text)
 
-                if not first_sent_message:
-                    first_sent_message = msg
+            if not first_sent_message:
+                first_sent_message = msg
 
-    # No plain text in Email.
-    else:
+    if not email.text:
         with suppress(TelegramBadRequest):
             msg = await bot.send_message(chat_id=topic.forum_id, message_thread_id=topic.topic_id,
                                          text=messages.email_message_without_text(email),
                                          disable_notification=disable_notification)
             first_sent_message = msg
+
     return first_sent_message
 
 
@@ -91,13 +99,17 @@ async def _send_email_attachments(bot: Bot, email: IncomingEmail, topic: TopicDT
     if email.attachments_paths:
         for attachment_path in email.attachments_paths:
             with suppress(TelegramBadRequest, TelegramNetworkError, FileNotFoundError):
-                await bot.send_document(chat_id=topic.forum_id,
-                                        message_thread_id=topic.topic_id,
-                                        reply_to_message_id=sent_text_message_to_reply.message_id,
-                                        document=FSInputFile(str(attachment_path)))
+                await bot.send_document(
+                    chat_id=topic.forum_id,
+                    message_thread_id=topic.topic_id,
+                    reply_to_message_id=sent_text_message_to_reply.message_id,
+                    document=FSInputFile(str(attachment_path))
+                )
 
 
-def _get_email_texts(email: IncomingEmail) -> list[str]:
+def _get_email_texts(email: IncomingEmail) -> list[str] | list[None]:
+    if not email.text:
+        return []
     first_text_part_index = 0
     last_text_part_index = len(email.text) - 1 if len(email.text) > 0 else 0
     texts = []
