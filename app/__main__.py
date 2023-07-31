@@ -13,8 +13,8 @@ from nats.js import JetStreamContext
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.handlers import factory, errors
-from app.core.handlers.forum import forum_updates
-from app.core.handlers.private import menu, email_adding_pipeline
+from app.core.handlers.forum import forum_events, creating_email
+from app.core.handlers.private import menu, adding_email_account
 from app.core.middlewares.db import DbSessionMiddleware
 from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.middlewares.nats import JetStreamContextMiddleware
@@ -47,7 +47,7 @@ async def main() -> None:
     await _set_schedulers(scheduler=scheduler, bot=bot, db_session_pool=db_session_pool, jetstream_context=jetstream)
 
     # Provide your default handler-modules into register() func.
-    factory.register(dp, menu, email_adding_pipeline, forum_updates, errors, )
+    factory.register(dp, menu, adding_email_account, creating_email, forum_events, errors, )
 
     try:
         await dp.start_polling(bot, _translator_hub=build_translator_hub(),
