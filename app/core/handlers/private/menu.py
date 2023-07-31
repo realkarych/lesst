@@ -16,7 +16,7 @@ from app.core.filters.chat_type import ChatTypeFilter
 from app.core.filters.limiter import limits_not_reached
 from app.core.keyboards import reply, inline
 from app.core.navigations import reply as reply_callbacks
-from app.core.navigations.command import Commands
+from app.core.navigations.command import PrivateChatCommands
 from app.core.states import callbacks as inline_callbacks
 from app.core.states.callbackdata_ids import MESSAGE_TO_REMOVE_ID
 from app.core.states.mail_authorization import EmailAuth
@@ -95,13 +95,13 @@ def register() -> Router:
     router.message.register(
         cmd_start,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Command(str(Commands.start))
+        Command(str(PrivateChatCommands.start))
     )
 
     router.message.register(
         cmd_cancel,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Command(str(Commands.cancel)),
+        Command(str(PrivateChatCommands.cancel)),
 
     )
 
