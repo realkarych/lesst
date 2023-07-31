@@ -1,21 +1,17 @@
-# Aioplate usage guide
+# Installation Guide
 
-**Aioplate is a universal scalable template for creating Telegram bots on Python Aiogram.**
-
-## Installation
-
-1) Create repo by this template
+1) Clone: `git clone https://github.com/innerbots/lesst` 
 2) Configure bot settings:
     1) Rename `app.ini.example` to `app.ini`. Don't worry, app.ini already added to gitignore.
-    2) Configure app.ini vars. Bot parse_mode, redis params are optional and you can remove it if you want.
+    2) Configure app.ini variables.
 3) Configure system:
-    - Install postgreSQL, systemd, Python 3.11, poetry.
+    - Install postgreSQL, systemd, Python 3.11, poetry, nats-server and nats cli.
 
 4) Configure Postgres & alembic:
-    - PSQL: `CREATE DATABASE your_database_name;`
-    - Already made:  `alembic init --template async migrations`
+    - PSQL: `CREATE DATABASE lesst;`
+    - Create migrations: `alembic init --template async migrations`
     - Add alembic.ini to gitignore
-    - Open alembic.ini -> `sqlalchemy.url = postgresql+asyncpg://user:pass@localhost/dbname`
+    - Open alembic.ini -> `sqlalchemy.url = postgresql+asyncpg://user:pass@localhost/lesst`
     - `alembic revision --autogenerate -m "init"`
     - `alembic upgrade head`
 
@@ -24,16 +20,41 @@
     - Install dependencies: `poetry install`
     - Run app: `poetry run app`
     - Update dependencies*: `poetry update`
+
 6) Configure nats-server:
     - Install nats-server: https://docs.nats.io/running-a-nats-service/introduction/installation.
     - Install nats-cli: https://github.com/nats-io/natscli/.
     - Install nats-top: https://github.com/nats-io/nats-top/releases.
     - Server: `nats-server -c nats.conf`
     - Stream: `nats stream add`
-    - Consumer: `nats consumer add`
-    - Bucket: `nats kv add name --history=5 --storage=file`
-
-   Guide: https://github.com/Vermilonik/HowCreateStreamAndConsumerNats
+      - **Stream name:** lesst
+      - **Subjects:** *
+      - **Storage:** file
+      - **Replication:** 1
+      - **Retention Policy:** Interest
+      - **Discard Policy:** New
+      - **Stream messages limit:** -1
+      - **Per subject messages limit:** -1
+      - **Total stream size:** -1
+      - **Message TTL:** -1
+      - **Max message size:** -1
+      - **Duplicate tracking time window:** 2m0s
+      - **Allow message Roll-ups:** No
+      - **Allow message deletion:** No
+      - **Allow purging subjects or the entire stream:** Yes
+   - Consumer: `nats consumer add`
+     - **Consumer name:** aiogram
+     - **Delivery target:** <Press Enter>
+     - **Start policy:** all
+     - **Acknowledgement policy:** explicit
+     - **Replay policy:** original
+     - **Filter Stream by subject:** <Press Enter>
+     - **Max allowed deliveries:** -1
+     - **Max acknowledgement pending:** 0
+     - **Deliver headers only without bodies:** No
+     - **Add a retry backoff policy:** No
+     - **Select a stream:** lesst
+   - Bucket (optional): `nats kv add name --history=5 --storage=file`
 
 7) It is highly recommended for deployment (Ubuntu / Debian):
     - Configure app.service file.
@@ -42,10 +63,10 @@
         - Check path to poetry env: ```poetry shell```
           ```which python```
         - Copy this path and replace PATH variable in app.service.
-    - `cp app.service etc/systemd/system/YOUR_APP_NAME.service`
-    - `sudo systemctl enable YOUR_APP_NAME.service`
-    - `sudo systemctl start YOUR_APP_NAME.service`
-    - Check status: `sudo systemctl status YOUR_APP_NAME.service`
+    - `cp app.service etc/systemd/system/lesst.service`
+    - `sudo systemctl enable lesst.service`
+    - `sudo systemctl start lesst.service`
+    - Check status: `sudo systemctl status lesst.service`
 
 **If you started app, and no errors occurred, after submitting /start command to your Bot, welcome message
 should be sent.**
