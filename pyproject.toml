@@ -5,7 +5,7 @@ description = "Lesst — less than Email client"
 authors = ["Andrey Karchevsky <karych@karych.ru>"]
 
 [tool.poetry.dependencies]
-python = "==3.11.4"
+python = "^3.11"
 aiogram = "==3.0.0b9"
 asyncpg = "==0.28.0"
 sqlalchemy = "==2.0.19"
@@ -16,7 +16,7 @@ aioimaplib = "==1.0.1"
 aiosmtplib = "==2.0.2"
 mail-parser = "==3.15.0"
 beautifulsoup4 = "==4.12.2"
-cryptography = "==41.0.2"
+cryptography = "==41.0.3"
 fluentogram = "==1.1.6"
 APScheduler = "==3.10.1"
 nats-py = "==2.3.1"
