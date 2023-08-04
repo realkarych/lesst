@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, unique
 
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats, BotCommandScopeAllGroupChats
 
 
 @dataclass
@@ -32,23 +32,33 @@ class BaseCommandList(Enum):
         return self.value
 
 
-class Commands(BaseCommandList):
+class PrivateChatCommands(BaseCommandList):
     """
     List of commands with public access & submission to Telegram menu list.
     Do not implement here admin commands because of submission to menu.
     """
 
-    start = Command(name='start', description='Перезапустить бота')
-    cancel = Command(name='cancel', description='Отменить действие')
+    start = Command(name="start", description="Перезапустить бота")
+    cancel = Command(name="cancel", description="Отменить действие")
+
+
+class ForumCommands(BaseCommandList):
+    create = Command(name="create", description="Создать Email")
 
 
 async def set_bot_commands(bot: Bot) -> None:
     """
-    Creates a commands' list (shortcut) in Telegram app menu.
+    Creates a commands' lists (shortcuts) in Telegram app menu.
     """
 
-    commands: list[BotCommand] = [command().to_bot_command() for command in Commands]
+    private_chat_commands: list[BotCommand] = [command().to_bot_command() for command in PrivateChatCommands]
     await bot.set_my_commands(
-        commands=commands,
-        scope=BotCommandScopeDefault()  # pyright: ignore
+        commands=private_chat_commands,
+        scope=BotCommandScopeAllPrivateChats()  # pyright: ignore
+    )
+
+    forum_commands: list[BotCommand] = [command().to_bot_command() for command in ForumCommands]
+    await bot.set_my_commands(
+        commands=forum_commands,
+        scope=BotCommandScopeAllGroupChats()  # pyright: ignore
     )

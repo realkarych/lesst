@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import codecs
 import logging
 import quopri
 import re
@@ -69,10 +70,8 @@ def _get_letter_type(part):
     if part["Content-Transfer-Encoding"] in (None, "7bit", "8bit", "binary"):
         return part.get_payload()
     elif part["Content-Transfer-Encoding"] == "base64":
-        encoding = part.get_content_charset()
-        return base64.b64decode(part.get_payload()).decode(encoding)
+        return codecs.decode(base64.b64decode(part.get_payload()))
     elif part["Content-Transfer-Encoding"] == "quoted-printable":
-        encoding = part.get_content_charset()
-        return quopri.decodestring(part.get_payload()).decode(encoding)
+        return codecs.decode(quopri.decodestring(part.get_payload()))
     else:  # all possible types: quoted-printable, base64, 7bit, 8bit, and binary
         return part.get_payload()

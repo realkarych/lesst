@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from app.dtos.dto import DTO
 from app.services import cryptography
 from app.services.database import models
-from app.services.email.entities import EmailService
+from app.services.email.base.entities import EmailService
 
 
 @dataclass(frozen=True)
-class EmailDTO(DTO):
+class UserEmailDTO(DTO):
     user_id: int
     mail_server: str
     mail_address: str

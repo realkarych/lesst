@@ -43,7 +43,6 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
-.cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -127,8 +126,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
 app.ini
 .idea/
 poetry.lock
 alembic.ini
 /nats
+.cache
+.income_cache
+.outgoing_cache

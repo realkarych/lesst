@@ -9,12 +9,12 @@ from mailparser import MailParser
 from app.settings.paths import ROOT_DIR
 
 
-class EmailCacheDirectory:
+class IncomingAttachmentsDirectory:
 
     def __init__(self, user_id: int) -> None:
         self._user_id = user_id
 
-    def __enter__(self) -> EmailCacheDirectory:
+    def __enter__(self) -> IncomingAttachmentsDirectory:
         self._path = self._build_base_path()
         return self
 
@@ -43,7 +43,7 @@ class EmailCacheDirectory:
         shutil.rmtree(self._path, ignore_errors=True)
 
     def _build_base_path(self) -> PurePath:
-        cache_dir = PurePath(ROOT_DIR / "app/.cache")
+        cache_dir = PurePath(ROOT_DIR / "app/.income_cache")
         path = PurePath(cache_dir / str(self._user_id))
         return path
 

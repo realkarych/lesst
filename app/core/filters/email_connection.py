@@ -13,9 +13,9 @@ from app.core.messages import remove_messages, enter_password_message
 from app.core.responses import edit_or_build_email_message
 from app.core.states.callbackdata_ids import EMAIL_PIPELINE_MESSAGE, EMAIL_SERVICE, EMAIL, PHOTO_TO_REMOVE_ID, \
     MESSAGE_GENERATE_KEY_ID, MESSAGE_TO_REMOVE_ID
-from app.services.email.cache import EmailCacheDirectory
-from app.services.email.entities import EmailService, EmailServices
-from app.services.email.fetcher.base import Mailbox
+from app.services.email.base.entities import EmailService, EmailServers
+from app.services.email.imap.attachments import IncomingAttachmentsDirectory
+from app.services.email.imap.fetcher.base import Mailbox
 from app.settings.paths import get_imap_image_path
 
 
@@ -56,13 +56,13 @@ def connection_success(handler: callable) -> Callable[[Message], Coroutine]:
 
 def _get_connection_refused_message(data: Dict[str, Any], i18n: TranslatorRunner, auth_key: str):
     match data.get(EMAIL_SERVICE):
-        case EmailServices.yandex:
+        case EmailServers.yandex:
             key_tutorial_url = urls.YANDEX_KEY_TUTORIAL_URL
             imap_tutorial_url = urls.YANDEX_IMAP_TUTORIAL_URL
-        case EmailServices.gmail:
+        case EmailServers.gmail:
             key_tutorial_url = urls.GOOGLE_KEY_TUTORIAL_URL
             imap_tutorial_url = urls.GOOGLE_IMAP_TUTORIAL_URL
-        case EmailServices.mail_ru:
+        case EmailServers.mail_ru:
             key_tutorial_url = urls.MAIL_RU_KEY_TUTORIAL_URL
             imap_tutorial_url = urls.MAIL_RU_IMAP_TUTORIAL_URL
         case _:
@@ -79,7 +79,7 @@ def _get_connection_refused_message(data: Dict[str, Any], i18n: TranslatorRunner
 
 
 async def is_connection_success(email_service: EmailService, email: str, auth_key: str, user_id: int) -> bool:
-    with EmailCacheDirectory(user_id) as cache:
+    with IncomingAttachmentsDirectory(user_id) as cache:
         mailbox = Mailbox(email_service=email_service, email_address=email, email_auth_key=auth_key, user_id=user_id,
                           cache_dir=cache)
         try:

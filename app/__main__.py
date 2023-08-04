@@ -13,14 +13,15 @@ from nats.js import JetStreamContext
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.handlers import factory, errors
-from app.core.handlers.forum import forum_updates
-from app.core.handlers.private import menu, email_adding_pipeline
+from app.core.handlers.forum import forum_events, creating_email
+from app.core.handlers.private import menu, adding_email_account
 from app.core.middlewares.db import DbSessionMiddleware
 from app.core.middlewares.i18n import TranslatorRunnerMiddleware
 from app.core.middlewares.nats import JetStreamContextMiddleware
 from app.core.navigations.command import set_bot_commands
 from app.core.templates import build_translator_hub
-from app.services.broker.broadcaster import broadcast_incoming_emails, fetch_incoming_emails
+from app.services.broker.broadcaster import broadcast_incoming_emails
+from app.services.broker.fetcher import fetch_incoming_emails
 from app.services.database.connector import setup_get_pool
 from app.settings import settings
 from app.settings.config import Config, load_config
@@ -34,7 +35,7 @@ async def main() -> None:
 
     bot = Bot(config.bot.token, parse_mode=config.bot.parse_mode)
     await set_bot_commands(bot=bot)
-    dp = Dispatcher(bot=bot, storage=MemoryStorage())
+    dp = Dispatcher(storage=MemoryStorage())
 
     db_session_pool = await setup_get_pool(db_uri=config.db.get_uri())
     nats_connection = await nats.connect(["nats://localhost:4222"])
@@ -46,7 +47,7 @@ async def main() -> None:
     await _set_schedulers(scheduler=scheduler, bot=bot, db_session_pool=db_session_pool, jetstream_context=jetstream)
 
     # Provide your default handler-modules into register() func.
-    factory.register(dp, menu, email_adding_pipeline, forum_updates, errors, )
+    factory.register(dp, menu, adding_email_account, creating_email, forum_events, errors, )
 
     try:
         await dp.start_polling(bot, _translator_hub=build_translator_hub(),
@@ -102,12 +103,12 @@ async def _set_schedulers(
 ) -> None:
     scheduler.add_job(
         broadcast_incoming_emails,
-        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        IntervalTrigger(seconds=settings.BROADCASTING_SEC_INTERVAL),
         (bot, db_session_pool, jetstream_context)
     )
     scheduler.add_job(
         fetch_incoming_emails,
-        IntervalTrigger(seconds=settings.CRON_SECONDS_INTERVAL),
+        IntervalTrigger(seconds=settings.FETCHING_SEC_INTERVAL),
         (db_session_pool, jetstream_context)
     )
 

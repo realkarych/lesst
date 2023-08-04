@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from contextlib import suppress
 
-from aiogram import types, Router, Bot
+from aiogram import types, Router, Bot, F
 from aiogram.enums import ChatType
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import Command, Text
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from fluentogram import TranslatorRunner
@@ -16,7 +16,7 @@ from app.core.filters.chat_type import ChatTypeFilter
 from app.core.filters.limiter import limits_not_reached
 from app.core.keyboards import reply, inline
 from app.core.navigations import reply as reply_callbacks
-from app.core.navigations.command import Commands
+from app.core.navigations.command import PrivateChatCommands
 from app.core.states import callbacks as inline_callbacks
 from app.core.states.callbackdata_ids import MESSAGE_TO_REMOVE_ID
 from app.core.states.mail_authorization import EmailAuth
@@ -27,12 +27,13 @@ from app.services.database.dao.user import UserDAO
 
 async def cmd_start(m: Message, i18n: TranslatorRunner, session: AsyncSession, state: FSMContext):
     await state.clear()
+
     await _add_user_to_db(session=session, message=m)
-    with suppress(TelegramBadRequest):
-        await m.answer(
-            text=i18n.welcome.one(user_firstname=str(m.from_user.first_name)),  # type: ignore
-            disable_web_page_preview=False
-        )
+
+    await m.answer(
+        text=i18n.welcome.one(user_firstname=str(m.from_user.first_name)),  # type: ignore
+        disable_web_page_preview=False
+    )
     message = await m.answer(
         text=i18n.welcome.two(),
         reply_markup=reply.menu(i18n)
@@ -94,26 +95,26 @@ def register() -> Router:
     router.message.register(
         cmd_start,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Command(str(Commands.start))
+        Command(str(PrivateChatCommands.start))
     )
 
     router.message.register(
         cmd_cancel,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Command(str(Commands.cancel)),
+        Command(str(PrivateChatCommands.cancel)),
 
     )
 
     router.message.register(
         btn_add_new_email,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Text(text=reply_callbacks.CONNECT_NEW_EMAIL)
+        F.text.in_(reply_callbacks.CONNECT_NEW_EMAIL)
     )
 
     router.message.register(
         btn_my_emails,
         ChatTypeFilter(chat_type=ChatType.PRIVATE),
-        Text(text=reply_callbacks.MY_EMAILS)
+        F.text.in_(reply_callbacks.MY_EMAILS)
     )
 
     router.callback_query.register(

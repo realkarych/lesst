@@ -19,9 +19,9 @@ from app.core.responses import edit_or_build_email_message
 from app.core.states import callbackdata_ids as cb_ids
 from app.core.states.callbacks import EmailServiceCallbackFactory
 from app.core.states.mail_authorization import EmailAuth
-from app.dtos.email import EmailDTO
+from app.dtos.email import UserEmailDTO
 from app.services.database.dao.email import EmailDAO
-from app.services.email.entities import get_service_by_id
+from app.services.email.base.entities import get_service_by_id
 from app.settings import paths
 from app.settings.paths import get_imap_image_path
 
@@ -40,11 +40,9 @@ async def cbq_email_service(c: types.CallbackQuery, callback_data: EmailServiceC
 @new_email
 async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner, email: str):
     data = await state.get_data()
-    text = get_imap_params_message(
-        i18n=i18n,
-        email_service=data.get(cb_ids.EMAIL_SERVICE),
-        email=email
-    )
+
+    text = get_imap_params_message(i18n=i18n, email_service=data.get(cb_ids.EMAIL_SERVICE), email=email)
+
     await edit_or_build_email_message(
         bot=bot, m=m, text=text, markup=None, message_id=data.get(cb_ids.EMAIL_PIPELINE_MESSAGE), state=state
     )
@@ -78,7 +76,7 @@ async def handle_correct_password(m: Message, bot: Bot, state: FSMContext, sessi
     )
 
     await EmailDAO(session=session).add_email(
-        email=EmailDTO.from_email(
+        email=UserEmailDTO.from_email(
             user_id=m.from_user.id,  # type: ignore
             email_service=data.get(cb_ids.EMAIL_SERVICE).value,  # type: ignore
             email_address=str(data.get(cb_ids.EMAIL)),

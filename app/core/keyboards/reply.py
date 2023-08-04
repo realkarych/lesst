@@ -8,13 +8,13 @@ class ResizedReplyKeyboard(ReplyKeyboardMarkup):
     every time.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.resize_keyboard = True
 
 
-def menu(i18n: TranslatorRunner) -> ResizedReplyKeyboard:
-    return ResizedReplyKeyboard(
+def menu(i18n: TranslatorRunner) -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
         keyboard=[
             [
                 KeyboardButton(text=i18n.menu.connect_email())
@@ -23,7 +23,8 @@ def menu(i18n: TranslatorRunner) -> ResizedReplyKeyboard:
                 KeyboardButton(text=i18n.menu.emails()),
                 KeyboardButton(text=i18n.menu.subscription())
             ]
-        ]
+        ],
+        resize_keyboard=True
     )
 
 
