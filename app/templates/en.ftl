@@ -70,3 +70,8 @@ button-remove_email = Remove Email
 button-back_to_email_services = 🔙 Back to Email-services
 button-back_to_email_address = 🔙 Back to Email
 button-add_to_chat = Add to chat
+email_form = From: { $from_address }
+             To: { $to_address }
+             Subject: { $subject }
+
+             { $plain_text_with_entities }

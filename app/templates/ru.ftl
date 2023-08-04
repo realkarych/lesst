@@ -70,3 +70,8 @@ button-remove_email = Удалить Email
 button-back_to_email_services = 🔙 Вернуться к Email-сервисам
 button-back_to_email_address = 🔙 Вернуться к Email
 button-add_to_chat = Добавить в чат
+email-form = От кого: { $from_address }
+             Кому: { $to_address }
+             Тема: { $subject }
+
+             { $plain_text_with_entities }
