@@ -58,12 +58,12 @@
 
 7) It is highly recommended for deployment (Ubuntu / Debian):
     - Systemd service for lesst app:
-      - `cp lesst_nats.service etc/systemd/system/lesst_nats.service`
+      - `cp lesst_nats.service /etc/systemd/system/lesst_nats.service`
       - `sudo systemctl enable lesst_nats.service`
       - `sudo systemctl start lesst_nats.service`
       - Check status: `sudo systemctl status lesst_nats.service`
     - Systemd service for nats server:
-      - `cp lesst.service etc/systemd/system/lesst.service`
+      - `cp lesst.service /etc/systemd/system/lesst.service`
       - `sudo systemctl enable lesst.service`
       - `sudo systemctl start lesst.service`
       - Check status: `sudo systemctl status lesst.service`
