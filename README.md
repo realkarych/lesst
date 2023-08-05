@@ -1,6 +1,6 @@
 # <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
 
-Автор: Карчевский Андрей (Karych).
+<a href="https://github.com/innerbots/lesst/blob/main/DOCS.md">*Installation Guide*</a>
 
 ## Описание проекта
 
@@ -54,4 +54,3 @@ Telegram).
 - Systemd — запуск приложения на сервере. Можно заменить Docker-ом.
 - Полный перечень использованных инструментов можно посмотреть
   в <a href="https://github.com/innerbots/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
-- <a href="https://github.com/innerbots/lesst/blob/main/DOCS.md">*Гайд по установке*</a>
