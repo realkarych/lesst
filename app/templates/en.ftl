@@ -73,5 +73,12 @@ button-add_to_chat = Add to chat
 email_form = From: { $from_address }
              To: { $to_address }
              Subject: { $subject }
-
              { $plain_text_with_entities }
+button-draft-send = Send Email
+button-draft-remove_draft = Remove draft
+button-draft-edit_text = Edit text
+button-draft-edit_subject = Edit subject
+button-draft-edit_recipient_address = Edit recipient Email
+button-draft-edit_attachments = Edit attachments
+draft-attachments = Your attachments:
+                         { $attachments }

@@ -73,5 +73,12 @@ button-add_to_chat = Добавить в чат
 email-form = От кого: { $from_address }
              Кому: { $to_address }
              Тема: { $subject }
-
              { $plain_text_with_entities }
+button-draft-send = Отправить
+button-draft-remove_draft = Удалить черновик
+button-draft-edit_text = Ред. текст
+button-draft-edit_subject = Ред. тему
+button-draft-edit_recipient_address = Ред. Email получателя
+button-draft-edit_attachments = Ред. вложения
+draft-attachments = Прикрепленные документы:
+                         { $attachments }

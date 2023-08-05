@@ -14,7 +14,7 @@ from app.services.database.dao.email import EmailDAO
 from app.services.email.imap import validator
 
 
-def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
+def valid_input_email(handler: callable) -> Callable[[Message], Coroutine]:
     async def wrapper(m: Message, bot: Bot, state: FSMContext, session: AsyncSession, i18n: TranslatorRunner):
         data = await state.get_data()
         await remove_messages(chat_id=m.from_user.id, bot=bot,
@@ -34,7 +34,7 @@ def valid_email(handler: callable) -> Callable[[Message], Coroutine]:
     return wrapper
 
 
-def new_email(handler: callable) -> Callable[[Message], Coroutine]:
+def is_new_email(handler: callable) -> Callable[[Message], Coroutine]:
     async def wrapper(m: Message, bot: Bot, state: FSMContext, session: AsyncSession, i18n: TranslatorRunner,
                       email: str):
         data = await state.get_data()

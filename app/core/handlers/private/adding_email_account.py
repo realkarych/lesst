@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.chat_type import ChatTypeFilter
 from app.core.filters.email_connection import connection_success
-from app.core.filters.email_validator import valid_email, new_email
+from app.core.filters.email_validator import valid_input_email, is_new_email
 from app.core.keyboards import inline, reply
 from app.core.messages import enter_password_message, get_imap_params_message, remove_messages
 from app.core.responses import edit_or_build_email_message
@@ -36,8 +36,8 @@ async def cbq_email_service(c: types.CallbackQuery, callback_data: EmailServiceC
     await state.set_state(EmailAuth.email)
 
 
-@valid_email
-@new_email
+@valid_input_email
+@is_new_email
 async def handle_valid_email(m: Message, bot: Bot, state: FSMContext, i18n: TranslatorRunner, email: str):
     data = await state.get_data()
 
