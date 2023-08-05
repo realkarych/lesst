@@ -57,16 +57,16 @@
    - Bucket (optional): `nats kv add name --history=5 --storage=file`
 
 7) It is highly recommended for deployment (Ubuntu / Debian):
-    - Configure app.service file.
-        - Set App name.
-        - Set Path to project.
-        - Check path to poetry env: ```poetry shell```
-          ```which python```
-        - Copy this path and replace PATH variable in app.service.
-    - `cp app.service etc/systemd/system/lesst.service`
-    - `sudo systemctl enable lesst.service`
-    - `sudo systemctl start lesst.service`
-    - Check status: `sudo systemctl status lesst.service`
+    - Systemd service for lesst app:
+      - `cp lesst_nats.service etc/systemd/system/lesst_nats.service`
+      - `sudo systemctl enable lesst_nats.service`
+      - `sudo systemctl start lesst_nats.service`
+      - Check status: `sudo systemctl status lesst_nats.service`
+    - Systemd service for nats server:
+      - `cp lesst.service etc/systemd/system/lesst.service`
+      - `sudo systemctl enable lesst.service`
+      - `sudo systemctl start lesst.service`
+      - Check status: `sudo systemctl status lesst.service`
 
 **If you started app, and no errors occurred, after submitting /start command to your Bot, welcome message
 should be sent.**
