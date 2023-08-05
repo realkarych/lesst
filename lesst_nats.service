@@ -1,0 +1,15 @@
+[Unit]
+Description=NATS server for lesst
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin//nats-server -c /home/www/bots/lesst/nats.conf
+User=www
+Group=www
+LimitNOFILE=65536
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

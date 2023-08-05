@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 User=www
-WorkingDirectory=
+WorkingDirectory=/home/www/bots/lesst
 Restart=on-failure
 RestartSec=2s
-ExecStart=PATH -m app
+ExecStart=/home/www/.cache/pypoetry/virtualenvs/lesst-BFpQBrOs-py3.11/bin/python -m app
 
 [Install]
 WantedBy=multi-user.target
