@@ -65,7 +65,7 @@ def _configure_logger() -> None:
     # file instead of stdout.
     # Example: filename=f"{ROOT_DIR}/error.log".
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.ERROR,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
     )
 
