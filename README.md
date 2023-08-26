@@ -1,6 +1,6 @@
 # <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
 
-<a href="https://github.com/innerbots/lesst/blob/main/DOCS.md">*Installation Guide*</a>
+<a href="https://github.com/yakarych/lesst/blob/main/DOCS.md">*Installation Guide*</a>
 
 ## Описание проекта
 
@@ -8,35 +8,35 @@
 и <a href="https://telegram.org/blog/ultimate-privacy-topics-2-0/ru#temi-2-0">Форумов</a> (реализации "тем" / "тредов" в
 Telegram).
 
-<img width="600" alt="image" src="https://github.com/innerbots/lesst/assets/62261985/0a53cf29-a748-4710-bf64-a78f0abcb1ab">
+<img width="600" alt="image" src="https://github.com/yakarych/lesst/assets/62261985/0a53cf29-a748-4710-bf64-a78f0abcb1ab">
 
 ## Функциональность | Особенности бота
 
 - Пользователь может подключить до пяти почтовых ящиков (Yandex, Gmail, MailRu). К каждому ящику создается форум для
   получения и отправки Email-ов.
 
-  <img width="300" alt="Снимок экрана 2023-07-09 в 03 05 36" src="https://github.com/innerbots/lesst/assets/62261985/18324140-5607-424b-971e-da4fe81c3781">
+  <img width="300" alt="Снимок экрана 2023-07-09 в 03 05 36" src="https://github.com/yakarych/lesst/assets/62261985/18324140-5607-424b-971e-da4fe81c3781">
 
 - Все вложения к письмам присылаются в качестве файлов прямо в Telegram.
 
-  <img width="263" alt="image" src="https://github.com/innerbots/lesst/assets/62261985/09720367-67a7-4701-a23b-f71427e27f93">
+  <img width="263" alt="image" src="https://github.com/yakarych/lesst/assets/62261985/09720367-67a7-4701-a23b-f71427e27f93">
 
 - Все входящие письма сортируются по Email-адресам. Таким образом, пользователь получает все письма (включая спам), но
   может отключать уведомления / блокировать письма от конкретного Email-адреса. Благодаря этому, важное письмо не
   затеряется в "Спаме" и не будет обработано почтовым автофильтром.
 
-  <img width="292" alt="Снимок экрана 2023-07-09 в 04 11 11" src="https://github.com/innerbots/lesst/assets/62261985/5d0f8851-3595-44b9-876a-a01d0e09a415">
+  <img width="292" alt="Снимок экрана 2023-07-09 в 04 11 11" src="https://github.com/yakarych/lesst/assets/62261985/5d0f8851-3595-44b9-876a-a01d0e09a415">
 
 - Сразу после подключения ящика, бот подгружает последние письма и сортирует их. Таким образом, пользователь может
   искать контент по последним письмам сразу после начала работы с ботом. Это аналог полноценного импорта в других
   почтовых клиентах.
 
-  <img width="227" alt="image" src="https://github.com/innerbots/lesst/assets/62261985/2ff61ab5-fd3a-4a44-97fb-ed290a346f51">
+  <img width="227" alt="image" src="https://github.com/yakarych/lesst/assets/62261985/2ff61ab5-fd3a-4a44-97fb-ed290a346f51">
 
 - После настройки и первичного анализа почты, каждый входящий Email будет приходить в чат моментально. Пользователю
   приходит стандартное уведомление в Telegram.
 
-  <img width="330" alt="Снимок экрана 2023-07-09 в 03 35 14" src="https://github.com/innerbots/lesst/assets/62261985/9b244a3f-93ac-4553-9a1c-f0c6129fd8ae">
+  <img width="330" alt="Снимок экрана 2023-07-09 в 03 35 14" src="https://github.com/yakarych/lesst/assets/62261985/9b244a3f-93ac-4553-9a1c-f0c6129fd8ae">
 
 ## Технический Стек
 
@@ -53,4 +53,4 @@ Telegram).
 - APScheduler — аналог crontab — управление регулярными процессами.
 - Systemd — запуск приложения на сервере. Можно заменить Docker-ом.
 - Полный перечень использованных инструментов можно посмотреть
-  в <a href="https://github.com/innerbots/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
+  в <a href="https://github.com/yakarych/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
