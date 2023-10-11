@@ -1,6 +1,6 @@
 # <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
 
-<a href="https://github.com/yakarych/lesst/blob/main/DOCS.md">*Installation Guide*</a>
+<a href="https://github.com/realkarych/lesst/blob/main/DOCS.md">*Installation Guide*</a>
 
 ## Описание проекта
 
@@ -53,4 +53,4 @@ Telegram).
 - APScheduler — аналог crontab — управление регулярными процессами.
 - Systemd — запуск приложения на сервере. Можно заменить Docker-ом.
 - Полный перечень использованных инструментов можно посмотреть
-  в <a href="https://github.com/yakarych/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
+  в <a href="https://github.com/realkarych/lesst/blob/main/pyproject.toml">зависимостях проекта</a>.
