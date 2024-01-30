@@ -1,4 +1,8 @@
-# <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
+# ВАЖНО
+
+*<p align=center>29.01.2024 я решил кардинально переосмыслить данный проект и сделать новую версию, исправив недочеты Lesst. Этот репозиторий станет архивом. Если Вас заинтересовал проект, Вам стоит посмотреть новую версию: https://github.com/realkarych/postamt</p>*
+
+### <a href="https://t.me/LesstRobot">Lesst</a> — less than Email client
 
 <a href="https://github.com/realkarych/lesst/blob/main/DOCS.md">*Installation Guide*</a>
 
